@@ -1,66 +1,1537 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
+<html lang="ar" dir="rtl">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Apps Script App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>فريق الترويج</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+ 
     <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        font-family: Arial, sans-serif;
-        background: #f6f8fb;
-        color: #1f2937;
-      }
+        :root {
+            --primary-color: #0f766e;
+            --primary-light: #14b8a6;
+            --secondary-color: #0369a1;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
 
-      main {
-        width: min(92vw, 520px);
-        padding: 32px;
-        border: 1px solid #dbe3ef;
-        border-radius: 8px;
-        background: #ffffff;
-      }
+        body { font-family: "Cairo", sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        #app-wrapper { width: 100%; max-width: 1150px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 80px; }
+        
+        .bg-primary { background-color: var(--primary-color); } .text-primary { color: var(--primary-color); }
+        .border-primary { border-color: var(--primary-color); }
+        .btn-primary { background-color: var(--primary-color); color: white; transition: all 0.3s; }
+        .btn-primary:hover { background-color: var(--primary-light); }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-up { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); } @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* FAB Settings */
+        .fab-container { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 60; }
+        .fab-button { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(15, 118, 110, 0.4); transition: transform 0.3s; cursor: pointer; }
+        .fab-button.active { transform: rotate(45deg); background: var(--danger-color); }
+        .fab-menu { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%) scale(0); transform-origin: bottom center; opacity: 0; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 10px; width: max-content; pointer-events: none; }
+        .fab-menu.show { transform: translateX(-50%) scale(1); opacity: 1; pointer-events: auto; }
+        .fab-item { background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-main); cursor: pointer; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 1150px; margin: 0 auto; background: white; box-shadow: 0 -2px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; border-top-left-radius: 24px; border-top-right-radius: 24px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 12px; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--primary-color); } .nav-item i { font-size: 20px; }
+        
+        .card { background: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; outline: none; transition: border 0.3s; }
+        .input-field:focus { border-color: var(--primary-color); background: white; }
+        .screen { display: none; } .screen.active { display: block; }
+        
+        #loader { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { border: 4px solid #e5e7eb; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-      button {
-        padding: 10px 16px;
-        border: 0;
-        border-radius: 6px;
-        background: #2563eb;
-        color: #ffffff;
-        cursor: pointer;
-      }
+        /* Custom Scrollbar for Search Dropdowns */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-      #result {
-        margin-top: 16px;
-        color: #475569;
-      }
+        /* Pill Picker */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pill-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 8px; padding: 5px 10px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
+        .pill-btn { flex-shrink: 0; scroll-snap-align: center; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; background: white; color: #64748b; border: 1px solid #e2e8f0; transition: all 0.2s ease; cursor: pointer; }
+        .pill-btn.selected { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.3); transform: scale(1.05); }
     </style>
-  </head>
-  <body>
-    <main>
-      <h1>Google Apps Script App</h1>
-      <p>Click the button to call a server-side Apps Script function.</p>
-      <button type="button" onclick="loadServerTime()">Get server time</button>
-      <div id="result"></div>
-    </main>
+</head>
+<body class="md:px-4 lg:px-8">
+
+    <div id="loader">
+        <div class="spinner" id="loading-spinner"></div>
+        <p class="mt-4 font-bold text-gray-700" id="loading-text">جاري الاتصال بقاعدة البيانات...</p>
+    </div>
+
+    <div id="fab-overlay" class="fixed inset-0 bg-gray-900/40 z-[45] hidden transition-opacity opacity-0" onclick="toggleFab()"></div>
+
+    <div id="app-wrapper">
+        <div id="login-screen" class="screen h-screen">
+            <div class="flex items-center justify-center h-full p-4">
+                <div class="card w-full max-w-md slide-up border border-gray-100 shadow-xl">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-boxes text-5xl text-primary mb-3"></i>
+                        <h1 class="text-2xl font-bold text-gray-800">تسجيل الدخول</h1>
+                        <p class="text-sm text-gray-500">نظام إدارة المروجين</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div><label class="block mb-1 text-sm font-semibold">اسم المستخدم</label><select id="login-username" class="input-field"></select></div>
+                        <div><label class="block mb-1 text-sm font-semibold">كلمة المرور</label><input type="password" id="login-password" class="input-field" placeholder="أدخل كلمة المرور"></div>
+                        <button onclick="handleLogin()" class="btn-primary w-full py-3 rounded-lg font-bold text-lg mt-4 shadow-lg">دخول</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="emp-main-screen" class="screen">
+            <div class="bg-primary text-white p-6 md:p-8 rounded-b-3xl md:rounded-3xl md:mt-4 shadow-md sticky top-0 z-50">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-1" id="emp-name-display">الاسم</h2>
+                        <p class="text-sm opacity-90"><i class="fas fa-map-marker-alt"></i> <span id="emp-location-display">الموقع</span></p>
+                    </div>
+                    <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl shrink-0 border border-white/30"><i class="fas fa-user"></i></div>
+                </div>
+            </div>
+            <div class="p-4 md:p-0 md:mt-8 relative z-10">
+                <h3 class="font-bold text-gray-700 mb-4 ml-2 text-lg"><i class="fas fa-history text-primary"></i> آخر الزيارات</h3>
+                <div id="recent-visits-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="visit-screen" class="screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center gap-3 md:rounded-b-2xl relative">
+                <button onclick="navigate('emp-main-screen', true)" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
+                <h2 class="text-xl font-bold">تسجيل زيارة</h2>
+            </div>
+            <div class="p-4 space-y-4 fade-in">
+                <div class="max-w-2xl mx-auto space-y-4">
+                    <div class="card space-y-4 border border-gray-100">
+                        <div class="custom-select relative w-full" id="market-select-visit">
+                            <label class="block mb-1 text-sm font-semibold text-gray-800">الماركت <span class="text-red-500">*</span></label>
+                            <input type="hidden" id="visit-market">
+                            <div class="input-field flex justify-between items-center cursor-pointer bg-white border-2 border-gray-100" onclick="toggleCustomSelect('visit')">
+                                <span id="visit-market-display" class="truncate text-gray-500 font-bold">اختر الماركت...</span>
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                            <div id="visit-market-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden">
+                                <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+                                    <div class="relative">
+                                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="visit-market-search" class="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold bg-white" placeholder="ابحث عن اسم الماركت هنا..." onkeyup="filterCustomSelect('visit')">
+                                    </div>
+                                </div>
+                                <div id="visit-market-options" class="max-h-60 overflow-y-auto p-2 custom-scrollbar"></div>
+                            </div>
+                        </div>
+
+                        <div><label class="block mb-1 text-sm font-semibold">سبب الزيارة</label><select id="visit-reason" class="input-field" onchange="markFormDirty()"><option value="خط سير">خط سير</option><option value="طلبية">طلبية</option></select></div>
+                        <div><label class="block mb-1 text-sm font-semibold">ملاحظات</label><textarea id="visit-notes" class="input-field h-28" placeholder="اكتب ملاحظاتك هنا..." oninput="markFormDirty()"></textarea></div>
+                    </div>
+                    <div class="text-center text-xs text-gray-500 px-4"><i class="fas fa-info-circle text-primary"></i> يجب أن تكون قريب بما فيه الكفاية من الماركت المحدد.</div>
+                    <button onclick="submitVisit()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-lg shadow-lg flex justify-center items-center gap-2"><i class="fas fa-location-arrow"></i> حفظ الزيارة</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="stock-screen" class="screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center gap-3 md:rounded-b-2xl relative">
+                <button onclick="navigate('emp-main-screen', true)" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
+                <h2 class="text-xl font-bold" id="stock-title">الجرد</h2>
+            </div>
+            <div class="p-4 space-y-4 fade-in">
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="card space-y-3 border border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="custom-select relative w-full">
+                                <label class="block mb-1 text-sm font-semibold text-gray-800">الماركت <span class="text-red-500">*</span></label>
+                                <input type="hidden" id="stock-market">
+                                <div class="input-field flex justify-between items-center cursor-pointer bg-white border-2 border-gray-100" onclick="toggleCustomSelect('stock')">
+                                    <span id="stock-market-display" class="truncate text-gray-500 font-bold">اختر الماركت...</span>
+                                    <i class="fas fa-chevron-down text-gray-400"></i>
+                                </div>
+                                <div id="stock-market-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden">
+                                    <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+                                        <div class="relative">
+                                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                            <input type="text" id="stock-market-search" class="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold bg-white" placeholder="ابحث عن اسم الماركت..." onkeyup="filterCustomSelect('stock')">
+                                        </div>
+                                    </div>
+                                    <div id="stock-market-options" class="max-h-60 overflow-y-auto p-2 custom-scrollbar"></div>
+                                </div>
+                            </div>
+                            <div><label class="block mb-1 text-sm font-semibold">التاريخ</label><input type="date" id="stock-date" class="input-field border-2 border-gray-100" onchange="validateDate(); markFormDirty()"></div>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-gray-700 text-sm mt-6">المنتجات المتوفرة:</h3>
+                    
+                    <div id="added-items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition flex flex-col items-center mt-2" onclick="openAddProductModal()">
+                        <i class="fas fa-plus text-3xl text-primary/50 mb-2"></i><p class="text-sm text-gray-700 font-bold">إضافة منتج للفاتورة</p>
+                    </div>
+                    <button onclick="submitStock()" class="btn-primary w-full py-4 rounded-xl font-bold text-lg shadow-lg mt-8">تقديم وحفظ الفاتورة</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="competitor-screen" class="screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center gap-3 md:rounded-b-2xl relative">
+                <button onclick="navigate('emp-main-screen', true)" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
+                <h2 class="text-xl font-bold text-primary">تقرير منافسين</h2>
+            </div>
+            <div class="p-4 space-y-4 fade-in">
+                <div class="max-w-2xl mx-auto space-y-4">
+                    <div class="card space-y-4 border border-gray-100">
+                        <div class="custom-select relative w-full">
+                            <label class="block mb-1 text-sm font-bold text-gray-800">إسم الماركت <span class="text-red-500">*</span></label>
+                            <input type="hidden" id="comp-market">
+                            <div class="input-field flex justify-between items-center cursor-pointer bg-white border-2 border-gray-100" onclick="toggleCustomSelect('comp')">
+                                <span id="comp-market-display" class="truncate text-gray-500 font-bold">اختر الماركت...</span>
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                            <div id="comp-market-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden">
+                                <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+                                    <div class="relative">
+                                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="comp-market-search" class="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold bg-white" placeholder="ابحث عن اسم الماركت..." onkeyup="filterCustomSelect('comp')">
+                                    </div>
+                                </div>
+                                <div id="comp-market-options" class="max-h-60 overflow-y-auto p-2 custom-scrollbar"></div>
+                            </div>
+                        </div>
+                        <div><label class="block mb-1 text-sm font-bold text-gray-700">إسم المنتج <span class="text-red-500">*</span></label><input type="text" id="comp-product" class="input-field focus:border-primary" placeholder="اكتب اسم المنتج بدقة" oninput="markFormDirty()"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block mb-1 text-sm font-bold text-gray-700">السعر (د.ع) <span class="text-red-500">*</span></label><input type="number" id="comp-price" class="input-field focus:border-primary" placeholder="مثال: 1500" oninput="markFormDirty()"></div>
+                            <div><label class="block mb-1 text-sm font-bold text-gray-700">الوزن <span class="text-red-500">*</span></label><input type="text" id="comp-weight" class="input-field focus:border-primary" placeholder="مثال: 500 غم" oninput="markFormDirty()"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block mb-1 text-sm font-bold text-gray-700">البلد المنشأ <span class="text-red-500">*</span></label><input type="text" id="comp-origin" class="input-field focus:border-primary" placeholder="مثال: تركيا" oninput="markFormDirty()"></div>
+                            <div><label class="block mb-1 text-sm font-bold text-gray-700">العدد بالكارتونة</label><input type="number" id="comp-carton" class="input-field focus:border-primary" placeholder="اختياري" oninput="markFormDirty()"></div>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-bold text-gray-700">صورة المنتج <span class="text-red-500">*</span></label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-gray-50 relative overflow-hidden hover:bg-gray-100 transition-colors cursor-pointer">
+                                <input type="file" id="comp-image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleCompetitorImage(event); markFormDirty()">
+                                <div id="comp-image-placeholder" class="flex flex-col items-center"><i class="fas fa-camera text-3xl text-primary/50 mb-2"></i><p class="text-sm text-gray-600 font-bold">التقط أو ارفع صورة</p></div>
+                                <div id="comp-image-preview-container" class="hidden relative z-10"><img id="comp-image-preview" src="" class="max-h-48 mx-auto rounded-lg shadow-sm border border-gray-200 object-contain"><p class="text-xs text-white bg-black/50 px-2 py-1 rounded mt-2 inline-block absolute bottom-2 left-1/2 transform -translate-x-1/2">انقر لتغيير الصورة</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="submitCompetitor()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-lg shadow-lg flex justify-center items-center gap-2"><i class="fas fa-paper-plane"></i> إرسال تقرير المنافس</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="performance-screen" class="screen min-h-screen flex-col">
+            <div class="bg-primary text-white p-6 md:p-8 rounded-b-3xl md:rounded-3xl md:mt-4 shadow-md sticky top-0 z-50 shrink-0">
+                <h2 class="text-2xl font-bold text-center">أدائي</h2>
+            </div>
+            <div class="flex-1 flex flex-col items-center justify-center p-6 text-center mt-10">
+                <h3 class="text-2xl font-black text-primary mt-6 mb-2">صفحة قيد التطوير</h3>
+                <p class="text-sm font-bold text-gray-500 max-w-xs leading-relaxed">نحن نعمل على تجهيز هذه الصفحة لعرض إحصائياتك وتقاريرك بشكل تفصيلي واحترافي قريباً.</p>
+            </div>
+        </div>
+
+        <div id="admin-home-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+                <h2 class="text-xl font-bold text-primary"><i class="fas fa-users mr-2"></i> فريق العمل</h2>
+                <button onclick="handleLogout()" class="text-danger-color font-bold text-sm bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+            <div class="p-4 md:p-0 pb-20" id="admin-employees-wrapper"></div>
+        </div>
+
+        <div id="admin-visits-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl relative">
+                <h2 class="text-xl font-bold text-primary"><i class="fas fa-route mr-2"></i> سجل الزيارات</h2>
+                <button onclick="document.getElementById('filters-visits').classList.toggle('hidden')" class="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-primary/20"><i class="fas fa-filter"></i> تصفية</button>
+            </div>
+            <div id="filters-visits" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="filter-visits-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('visits', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-visits-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('visits', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-visits-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('visits', 'market')"><option value="">كل الماركتات</option></select>
+                    <select id="filter-visits-reason" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('visits', 'reason')"><option value="">كل الأسباب</option><option value="خط سير">خط سير</option><option value="طلبية">طلبية</option></select>
+                    
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-visits-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
+                        <input type="date" id="filter-visits-date-from" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="syncDateTo('visits'); onFilterChange('visits', 'date')">
+                    </div>
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-visits-date-to" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">إلى</label>
+                        <input type="date" id="filter-visits-date-to" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="onFilterChange('visits', 'date')">
+                    </div>
+                </div>
+                <button onclick="clearAdminFilters('visits')" class="text-danger-color bg-red-50 hover:bg-red-100 py-2 rounded-lg text-xs w-full mt-2 font-bold transition-colors"><i class="fas fa-times"></i> مسح الفلاتر</button>
+            </div>
+            <div class="p-4 md:p-0 pb-20" id="admin-all-visits-container"></div>
+        </div>
+
+        <div id="admin-daily-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+                <h2 class="text-xl font-bold text-secondary-color"><i class="fas fa-clipboard-list mr-2"></i> تقارير النقوصات</h2>
+                <button onclick="document.getElementById('filters-daily').classList.toggle('hidden')" class="bg-secondary-color/10 text-secondary-color px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-secondary-color/20"><i class="fas fa-filter"></i> تصفية</button>
+            </div>
+            <div id="filters-daily" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="filter-daily-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('daily', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-daily-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('daily', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-daily-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('daily', 'market')"><option value="">كل الماركتات</option></select>
+                    
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-daily-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
+                        <input type="date" id="filter-daily-date-from" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="syncDateTo('daily'); onFilterChange('daily', 'date')">
+                    </div>
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-daily-date-to" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">إلى</label>
+                        <input type="date" id="filter-daily-date-to" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="onFilterChange('daily', 'date')">
+                    </div>
+                </div>
+                <button onclick="clearAdminFilters('daily')" class="text-danger-color bg-red-50 hover:bg-red-100 py-2 rounded-lg text-xs w-full mt-2 font-bold transition-colors"><i class="fas fa-times"></i> مسح الفلاتر</button>
+            </div>
+            <div class="p-4 md:p-0 pb-20" id="admin-all-daily-container"></div>
+        </div>
+
+        <div id="admin-monthly-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+                <h2 class="text-xl font-bold text-accent-color"><i class="fas fa-calendar-check mr-2"></i> الجرد الشهري</h2>
+                <button onclick="document.getElementById('filters-monthly').classList.toggle('hidden')" class="bg-accent-color/10 text-accent-color px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-accent-color/20"><i class="fas fa-filter"></i> تصفية</button>
+            </div>
+            <div id="filters-monthly" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="filter-monthly-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('monthly', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-monthly-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('monthly', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-monthly-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('monthly', 'market')"><option value="">كل الماركتات</option></select>
+                    
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-monthly-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
+                        <input type="date" id="filter-monthly-date-from" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="syncDateTo('monthly'); onFilterChange('monthly', 'date')">
+                    </div>
+                    <div class="relative col-span-1 mt-1">
+                        <label id="label-monthly-date-to" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">إلى</label>
+                        <input type="date" id="filter-monthly-date-to" class="input-field py-2.5 text-sm font-bold transition-colors w-full relative z-0" onchange="onFilterChange('monthly', 'date')">
+                    </div>
+                </div>
+                <button onclick="clearAdminFilters('monthly')" class="text-danger-color bg-red-50 hover:bg-red-100 py-2 rounded-lg text-xs w-full mt-2 font-bold transition-colors"><i class="fas fa-times"></i> مسح الفلاتر</button>
+            </div>
+            <div class="p-4 md:p-0 pb-20" id="admin-all-monthly-container"></div>
+        </div>
+
+        <div id="admin-employee-detail-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center gap-3 md:rounded-b-2xl mb-4">
+                <button onclick="navigateAdmin('admin-home-screen')" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
+                <h2 class="text-xl font-bold" id="detail-emp-name">ملف الموظف</h2>
+            </div>
+            <div class="p-4 md:p-0 space-y-8 pb-20">
+                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-route text-primary ml-1"></i> الزيارات</h3><div id="detail-visits-wrapper"></div></div>
+                <hr class="border-gray-200">
+                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-clipboard-list text-secondary-color ml-1"></i> النقوصات</h3><div id="detail-daily-wrapper"></div></div>
+                <hr class="border-gray-200">
+                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-calendar-check text-accent-color ml-1"></i> الجرد الشهري</h3><div id="detail-monthly-wrapper"></div></div>
+            </div>
+        </div>
+
+        <div id="admin-report-details-screen" class="screen min-h-screen">
+            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center justify-between md:rounded-b-2xl mb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="navigateAdmin(previousAdminScreen)" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
+                    <h2 class="text-xl font-bold" id="report-detail-title">تفاصيل الفاتورة</h2>
+                </div>
+            </div>
+            <div class="p-4 md:p-0 pb-20">
+                <div id="report-detail-info" class="mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center"></div>
+                <div id="report-detail-items" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
+            </div>
+        </div>
+
+    </div> <div class="fab-container hidden" id="employee-fab">
+        <div class="fab-menu" id="fab-menu">
+            <div class="fab-item" onclick="openForm('visit')"><i class="fas fa-map-marker-alt text-primary"></i> تسجيل زيارة</div>
+            <div class="fab-item" onclick="openForm('daily')"><i class="fas fa-clipboard-list text-secondary-color"></i> تقرير النقوصات</div>
+            <div class="fab-item" onclick="openForm('monthly')"><i class="fas fa-calendar-check text-accent-color"></i> جرد شهري</div>
+            <div class="fab-item" onclick="openForm('competitor')"><i class="fas fa-store-slash text-primary"></i> تقرير منافسين</div>
+        </div>
+        <div class="fab-button" onclick="toggleFab()" id="fab-btn"><i class="fas fa-plus"></i></div>
+    </div>
+    
+    <div class="bottom-nav hidden" id="employee-nav">
+        <div class="nav-item active" onclick="navigate('emp-main-screen', true, this)"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+        <div class="nav-item" onclick="navigate('performance-screen', true, this)"><i class="fas fa-chart-bar"></i><span>أدائي</span></div>
+        <div class="nav-item text-danger-color" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>خروج</span></div>
+    </div>
+
+    <div class="bottom-nav hidden" id="admin-nav">
+        <div class="nav-item active" onclick="navigateAdmin('admin-home-screen', this)"><i class="fas fa-users"></i><span>الفريق</span></div>
+        <div class="nav-item" onclick="navigateAdmin('admin-visits-screen', this)"><i class="fas fa-route"></i><span>الزيارات</span></div>
+        <div class="nav-item" onclick="navigateAdmin('admin-daily-screen', this)"><i class="fas fa-clipboard-list text-secondary-color"></i><span class="text-secondary-color">النقوصات</span></div>
+        <div class="nav-item" onclick="navigateAdmin('admin-monthly-screen', this)"><i class="fas fa-calendar-check text-accent-color"></i><span class="text-accent-color">الجرد</span></div>
+    </div>
+
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden sm:flex-row flex-col justify-end sm:justify-center items-center sm:p-4">
+        <div class="bg-white w-full sm:max-w-5xl sm:rounded-3xl rounded-t-3xl p-4 sm:p-6 max-h-[90vh] flex flex-col slide-up relative">
+            <div class="flex justify-between items-center mb-5 shrink-0">
+                <h3 class="font-bold text-xl text-gray-800">اختر المنتجات</h3>
+                <button onclick="closeAddProductModal()" class="text-gray-500 text-lg w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-full"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="shrink-0 mb-4 max-w-sm mx-auto w-full">
+                <label class="block mb-2 text-sm font-bold text-gray-700">حدد البراند للبحث:</label>
+                <div class="custom-select relative w-full" id="brand-select-container">
+                    <input type="hidden" id="modal-brand-select">
+                    <div class="input-field flex justify-between items-center cursor-pointer bg-white border-2 border-gray-200 focus:border-primary font-bold transition-colors" onclick="toggleCustomSelect('brand')">
+                        <span id="brand-select-display" class="truncate text-gray-500">-- يرجى اختيار البراند --</span>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                    <div id="brand-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden">
+                        <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+                            <div class="relative">
+                                <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="brand-search-input" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold" placeholder="ابحث عن براند..." onkeyup="filterBrands()">
+                            </div>
+                        </div>
+                        <div id="brand-options" class="max-h-48 overflow-y-auto p-2 custom-scrollbar"></div>
+                    </div>
+                </div>
+
+                <div id="product-search-container" class="mt-3 relative hidden fade-in">
+                    <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-primary/50"></i>
+                    <input type="text" id="modal-product-search" class="w-full pl-3 pr-10 py-2.5 bg-primary/5 border border-primary/20 rounded-lg focus:border-primary outline-none text-sm font-bold transition-colors" placeholder="ابحث عن منتج بالاسم..." onkeyup="filterModalProducts()">
+                </div>
+            </div>
+
+            <div id="modal-products-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 hidden overflow-y-auto pb-2 flex-1 p-1"></div>
+            <button onclick="closeAddProductModal()" class="btn-primary w-full sm:max-w-sm sm:mx-auto py-3.5 rounded-xl font-bold text-lg shadow-lg mt-5 shrink-0">إغلاق</button>
+        </div>
+    </div>
+
+    <div id="monthly-add-modal" class="fixed inset-0 bg-black/70 z-[70] hidden flex-col justify-end sm:justify-center items-center sm:p-4">
+        <div class="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-6 slide-up shadow-2xl relative">
+            <button onclick="closeMonthlyAddModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-700 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full"><i class="fas fa-times"></i></button>
+            
+            <h3 class="font-black text-xl text-primary text-center mb-4 border-b border-gray-100 pb-3">إضافة للجرد الشهري</h3>
+            <p id="monthly-item-name" class="font-bold text-gray-800 text-center text-sm mb-5 bg-gray-50 py-2.5 rounded-lg border border-gray-200 line-clamp-2 px-2"></p>
+
+            <div class="mb-5">
+                <label class="block mb-2 text-sm font-bold text-gray-700 text-center">العدد (الكمية): <span class="text-red-500">*</span></label>
+                <input type="number" id="monthly-item-qty" class="input-field text-center text-2xl font-black h-14 bg-gray-50 focus:bg-white" placeholder="0" min="1">
+            </div>
+
+            <div class="mb-8">
+                <label class="block mb-3 text-sm font-bold text-gray-700 text-center">تاريخ إنتهاء الصلاحية:</label>
+                <div class="space-y-3" dir="ltr">
+                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400 w-10 text-right">Year</span><div class="pill-container hide-scrollbar" id="pill-year"></div></div>
+                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400 w-10 text-right">Month</span><div class="pill-container hide-scrollbar" id="pill-month"></div></div>
+                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-400 w-10 text-right">Day</span><div class="pill-container hide-scrollbar" id="pill-day"></div></div>
+                </div>
+            </div>
+
+            <button onclick="confirmMonthlyAdd()" class="btn-primary w-full py-3.5 rounded-xl font-black text-lg shadow-lg flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle"></i> تأكيد الإضافة
+            </button>
+        </div>
+    </div>
+
+    <div id="admin-add-item-modal" class="fixed inset-0 bg-black/60 z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[400px] rounded-3xl p-6 slide-up shadow-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-bold text-xl text-primary">إضافة مادة للفاتورة</h3>
+                <button onclick="closeAdminAddItemModal()" class="text-gray-500 text-lg w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-full"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="block mb-1 text-sm font-bold text-gray-700">البراند</label><select id="admin-modal-brand" class="input-field" onchange="renderAdminModalItems()"><option value="">اختر البراند...</option></select></div>
+                <div><label class="block mb-1 text-sm font-bold text-gray-700">المنتج</label><select id="admin-modal-item" class="input-field"><option value="">اختر المنتج...</option></select></div>
+                <div id="admin-modal-qty-container" class="hidden">
+                    <label class="block mb-1 text-sm font-bold text-gray-700">الكمية</label><input type="number" id="admin-modal-qty" class="input-field" placeholder="أدخل الكمية">
+                </div>
+                <button onclick="submitAdminNewItem()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-lg mt-4">إضافة وحفظ</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-      function loadServerTime() {
-        const result = document.getElementById('result');
-        result.textContent = 'Loading...';
+        let appData = { employees: [], markets: [], items: [] };
+        let adminDataCache = { visits: [], daily: [], monthly: [] };
+        let currentUser = null;
+        let isFormDirty = false;
+        let currentFormType = ""; 
+        let currentCart = []; 
+        let uniqueBrands = [];
+        let adminAddContext = {};
+        let loadingTimeout; 
+        let currentCompetitorImageBase64 = "";
+        let pendingMonthlyItem = null;
+        let adminRefreshInterval = null;
+        let previousAdminScreen = 'admin-home-screen'; 
 
-        google.script.run
-          .withSuccessHandler(function (time) {
-            result.textContent = 'Server time: ' + time;
-          })
-          .withFailureHandler(function (error) {
-            result.textContent = 'Error: ' + error.message;
-          })
-          .getServerTime();
-      }
+        function showLoading(text) {
+            const loader = document.getElementById("loader");
+            const loadingText = document.getElementById("loading-text");
+            if (loader) loader.style.display = "flex";
+            if (loadingText) loadingText.textContent = text;
+        }
+
+        function hideLoading() {
+            const loader = document.getElementById("loader");
+            if (loader) loader.style.display = "none";
+        }
+
+        function showCriticalError(err) {
+            clearTimeout(loadingTimeout);
+            const loader = document.getElementById("loader");
+            if (!loader) return;
+            let errorMsg = "حدث خطأ غير متوقع.";
+            if (typeof err === "string") errorMsg = err;
+            else if (err && err.message) errorMsg = err.message;
+            loader.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-[90%] mx-auto text-center border-t-4 border-red-500 slide-up"><h3 class="text-gray-800 font-bold text-xl mb-2">تعذر بدء التطبيق</h3><p class="text-sm text-red-600 font-semibold mb-6 p-4 bg-red-50 rounded-xl text-right leading-relaxed" dir="auto">${errorMsg}</p><button onclick="reloadApp()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-3.5 rounded-xl font-bold w-full transition-colors">تحديث وإعادة المحاولة</button></div>`;
+        }
+
+        window.onerror = function(msg, url, line, col, error) { showCriticalError("خطأ برمجي: " + msg); return false; };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const passInput = document.getElementById('login-password');
+            if(passInput) {
+                passInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            }
+            window.addEventListener("beforeunload", function (e) { if (isFormDirty) { e.preventDefault(); e.returnValue = ""; } });
+            initPillPickers();
+        });
+
+        function reloadApp() {
+            showLoading("جاري تحديث البيانات...");
+            
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById("employee-fab").classList.add("hidden"); 
+            document.getElementById("employee-nav").classList.add("hidden");
+            document.getElementById("admin-nav").classList.add("hidden");
+            
+            if(adminRefreshInterval) {
+                clearInterval(adminRefreshInterval);
+                adminRefreshInterval = null;
+            }
+            
+            isFormDirty = false;
+            currentCart = [];
+            currentCompetitorImageBase64 = "";
+            document.getElementById("login-password").value = "";
+            currentUser = null;
+            
+            startApp();
+        }
+
+        function startApp() {
+            try {
+                const today = new Date().toISOString().split("T")[0];
+                const stockDate = document.getElementById("stock-date");
+                if (stockDate) { stockDate.max = today; stockDate.value = today; }
+
+                if (loadingTimeout) clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    const loader = document.getElementById("loader");
+                    if(loader && loader.style.display !== "none") showCriticalError("انتهت مهلة الاتصال. السيرفر لا يستجيب.");
+                }, 15000);
+
+                if(typeof google !== "undefined" && google.script) {
+                    google.script.run.withSuccessHandler(initApp).withFailureHandler(showCriticalError).getInitialData();
+                } else {
+                    initApp({
+                        employees: [{name:"الإدارة", role:"مدير", password:"123"}, {name:"محمد علي", province:"بغداد", side:"كرخ", role:"موظف", password:"123"}, {name:"علي أحمد", province:"بابل", role:"موظف", password:"123"}],
+                        markets: [{code:"C1", name:"ماركت تيست", province:"بغداد", side:"كرخ"}],
+                        items: [{code:"ITM000096", image:"", name:"منتج أ طويل لتجربة العرض المخصص للهاتف", brand:"Brand A", stock: "10"}, {code:"I2", image:"", name:"منتج ب", brand:"Brand A", stock: "0"}]
+                    });
+                }
+            } catch (err) { showCriticalError(err); }
+        }
+
+        function initApp(data) {
+            clearTimeout(loadingTimeout); 
+            try {
+                if (!data) throw new Error("لم يتم استلام بيانات.");
+                appData = { employees: data.employees || [], markets: data.markets || [], items: data.items || [] };
+                uniqueBrands = [...new Set(appData.items.map(item => item.brand))];
+                
+                const empSelect = document.getElementById("login-username");
+                empSelect.innerHTML = "<option value=\"\">اختر اسمك...</option>";
+                
+                appData.employees.forEach(emp => {
+                    if(emp.name !== "الإدارة" && !emp.role.includes("مدير")) { 
+                        let opt = document.createElement("option"); opt.value = emp.name; opt.textContent = emp.name; empSelect.appendChild(opt);
+                    }
+                });
+                appData.employees.filter(e => e.name === "الإدارة" || e.role.includes("مدير")).forEach(emp => {
+                     let opt = document.createElement("option"); opt.value = emp.name; opt.textContent = emp.name; empSelect.appendChild(opt);
+                });
+
+                const savedUserStr = localStorage.getItem('alfarah_user');
+                if(savedUserStr) {
+                    const savedUser = JSON.parse(savedUserStr);
+                    const validUser = appData.employees.find(e => e.name === savedUser.name && String(e.password) === String(savedUser.password));
+                    if(validUser) {
+                        postLogin({success: true, user: validUser}, false);
+                        return;
+                    } else {
+                        localStorage.removeItem('alfarah_user');
+                    }
+                }
+
+                hideLoading();
+                navigate("login-screen");
+            } catch (err) { showCriticalError("خطأ أثناء بناء الواجهة: " + err.message); }
+        }
+
+        function handleLogin() {
+            const userBox = document.getElementById("login-username").value; const passBox = document.getElementById("login-password").value;
+            if(!userBox || !passBox) return Swal.fire({icon: "warning", title: "تنبيه", text: "يرجى إدخال الاسم وكلمة المرور"});
+            showLoading("جاري تسجيل الدخول...");
+            if(typeof google !== "undefined") {
+                google.script.run.withSuccessHandler(postLogin).withFailureHandler(showCriticalError).loginUser(userBox, passBox);
+            } else {
+                const user = appData.employees.find(e => e.name === userBox && e.password === passBox);
+                postLogin(user ? {success:true, user:user} : {success:false, message:"كلمة المرور خاطئة"});
+            }
+        }
+
+        function postLogin(response, manual = true) {
+            hideLoading();
+            if(response.success) {
+                currentUser = response.user;
+                localStorage.setItem('alfarah_user', JSON.stringify(currentUser)); 
+                
+                if(currentUser.role.includes("مدير") || currentUser.role.includes("الإدارة")) {
+                    document.getElementById("admin-nav").classList.remove("hidden");
+                    loadAdminDashboard();
+                } else {
+                    setupEmployeeUI();
+                }
+            } else {
+                if(manual) Swal.fire({icon: "error", title: "خطأ", text: response.message});
+            }
+        }
+
+        function handleLogout() {
+            const executeLogout = () => {
+                localStorage.removeItem('alfarah_user'); 
+                reloadApp(); 
+            };
+
+            if(isFormDirty) {
+                Swal.fire({title: "تنبيه!", text: "لديك بيانات لم تقم بحفظها، هل أنت متأكد من الخروج؟", icon: "warning", showCancelButton: true, confirmButtonText: "نعم، أخرج", cancelButtonText: "إلغاء"})
+                .then(r => { if(r.isConfirmed) { isFormDirty = false; executeLogout(); }});
+            } else {
+                Swal.fire({title: "تسجيل خروج؟", icon: "warning", showCancelButton: true, confirmButtonColor: "#0f766e", cancelButtonColor: "#ef4444", confirmButtonText: "نعم", cancelButtonText: "إلغاء"})
+                .then((result) => { if (result.isConfirmed) executeLogout(); });
+            }
+        }
+
+        function formatDateTime(dateStr) {
+            try {
+                if(!dateStr) return { date: "", time: "" };
+                let str = String(dateStr).trim();
+                let d = new Date(str);
+                
+                if (isNaN(d)) d = new Date(str.replace(/-/g, '/'));
+                
+                if (isNaN(d)) {
+                    let parts = str.split(' ');
+                    if(parts.length >= 2) {
+                        let timeP = parts.find(p => p.includes(':')) || "";
+                        let dateP = parts.find(p => !p.includes(':') && (p.includes('/') || p.includes('-'))) || parts[0];
+                        return { date: dateP, time: timeP, rawObj: null };
+                    }
+                    return { date: str, time: "", rawObj: null };
+                }
+
+                const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0');
+                
+                let hasTime = str.includes(":") || str.includes("T") || (d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0);
+                let timeStr = "";
+                
+                if(hasTime) {
+                    let h = d.getHours(); const min = String(d.getMinutes()).padStart(2, "0");
+                    const ampm = h >= 12 ? "م" : "ص"; h = h % 12; h = h ? h : 12;
+                    timeStr = `${h}:${min} ${ampm}`;
+                }
+                return { date: `${y}/${m}/${day}`, time: timeStr, rawObj: d };
+            } catch(e) { return { date: String(dateStr), time: "", rawObj: null }; }
+        }
+
+        function getDateGroupLabel(dateObjStr) {
+            const dtInfo = formatDateTime(dateObjStr);
+            if(!dtInfo.rawObj) return dtInfo.date; 
+
+            const today = new Date(); today.setHours(0,0,0,0);
+            const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+            
+            const checkD = new Date(dtInfo.rawObj); checkD.setHours(0,0,0,0);
+            
+            if(checkD.getTime() === today.getTime()) return "اليوم";
+            if(checkD.getTime() === yest.getTime()) return "البارحة";
+            
+            return dtInfo.date; 
+        }
+
+        function getDirectImageUrl(url) {
+            if (!url || typeof url !== "string") return null;
+            const driveRegex = /\/file\/d\/([a-zA-Z0-9_-]+)/; const match = url.match(driveRegex);
+            if (match && match[1]) return "https://lh3.googleusercontent.com/d/" + match[1];
+            const driveRegexOld = /\/d\/([a-zA-Z0-9_-]+)/; const matchOld = url.match(driveRegexOld);
+            if (matchOld && matchOld[1]) return "https://lh3.googleusercontent.com/d/" + matchOld[1];
+            return url;
+        }
+
+        function toggleCustomSelect(type) {
+            const dropdownId = type === 'brand' ? 'brand-dropdown' : `${type}-market-dropdown`;
+            const searchInputId = type === 'brand' ? 'brand-search-input' : `${type}-market-search`;
+            
+            const dropdown = document.getElementById(dropdownId);
+            const isHidden = dropdown.classList.contains('hidden');
+            
+            document.querySelectorAll('[id$="-dropdown"]').forEach(el => el.classList.add('hidden'));
+            if (isHidden) { 
+                dropdown.classList.remove('hidden'); 
+                const searchInput = document.getElementById(searchInputId);
+                if(searchInput) searchInput.focus(); 
+            }
+        }
+        
+        function filterCustomSelect(type) {
+            const term = document.getElementById(`${type}-market-search`).value.toLowerCase();
+            const options = document.getElementById(`${type}-market-options`).children;
+            let hasVisible = false;
+            for(let opt of options) {
+                if(opt.classList.contains('no-results-msg')) continue;
+                if(opt.innerText.toLowerCase().includes(term)) { opt.style.display = 'flex'; hasVisible = true; } else { opt.style.display = 'none'; }
+            }
+            const noRes = document.getElementById(`${type}-no-results`);
+            if(noRes) noRes.style.display = hasVisible ? 'none' : 'block';
+        }
+        
+        function selectCustomOption(type, code, name, lat, lng) {
+            document.getElementById(`${type}-market`).value = code; document.getElementById(`${type}-market-display`).textContent = name;
+            document.getElementById(`${type}-market-display`).classList.remove('text-gray-500'); document.getElementById(`${type}-market-display`).classList.add('text-gray-800', 'font-bold');
+            const hiddenInput = document.getElementById(`${type}-market`);
+            hiddenInput.setAttribute('data-lat', lat); hiddenInput.setAttribute('data-lng', lng); hiddenInput.setAttribute('data-name', name); 
+            document.getElementById(`${type}-market-dropdown`).classList.add('hidden'); markFormDirty();
+        }
+        
+        document.addEventListener('click', function(e) { 
+            if(!e.target.closest('.custom-select')) { 
+                document.querySelectorAll('[id$="-dropdown"]').forEach(el => el.classList.add('hidden')); 
+            } 
+        });
+
+        function initPillPickers() {
+            let yHtml = ''; for(let y=2024; y<=2035; y++) yHtml += `<div class="pill-btn" onclick="selectPill('pill-year', this, ${y})">${y}</div>`; document.getElementById('pill-year').innerHTML = yHtml;
+            let mHtml = ''; for(let m=1; m<=12; m++) mHtml += `<div class="pill-btn" onclick="selectPill('pill-month', this, ${m})">${String(m).padStart(2,'0')}</div>`; document.getElementById('pill-month').innerHTML = mHtml;
+            let dHtml = ''; for(let d=1; d<=31; d++) dHtml += `<div class="pill-btn" onclick="selectPill('pill-day', this, ${d})">${String(d).padStart(2,'0')}</div>`; document.getElementById('pill-day').innerHTML = dHtml;
+        }
+        function selectPill(containerId, element, val) {
+            const container = document.getElementById(containerId);
+            container.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('selected'));
+            element.classList.add('selected'); element.setAttribute('data-val', val); container.setAttribute('data-current', val);
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+        function setPillValue(containerId, val) {
+            const container = document.getElementById(containerId);
+            container.querySelectorAll('.pill-btn').forEach(b => { if(parseInt(b.textContent) === parseInt(val)) selectPill(containerId, b, val); });
+        }
+        function getPillValue(containerId) { return document.getElementById(containerId).getAttribute('data-current'); }
+
+        function setupEmployeeUI() {
+            document.getElementById("emp-name-display").textContent = currentUser.name;
+            let loc = currentUser.province; if(loc === "بغداد" && currentUser.side) loc += " - " + currentUser.side;
+            document.getElementById("emp-location-display").textContent = loc;
+            document.getElementById("employee-fab").classList.remove("hidden"); document.getElementById("employee-nav").classList.remove("hidden");
+            filterMarketsForUser();
+            if(typeof google !== "undefined") google.script.run.withSuccessHandler(renderEmpVisits).withFailureHandler(showCriticalError).getEmployeeDashboardData(currentUser.name);
+            else renderEmpVisits({visits: []});
+            navigate("emp-main-screen");
+        }
+
+        function renderEmpVisits(data) {
+            const container = document.getElementById("recent-visits-list"); container.innerHTML = "";
+            if(!data.visits || data.visits.length === 0) { container.innerHTML = "<div class=\"col-span-full text-center text-gray-500 font-bold py-8 bg-white rounded-2xl border border-dashed border-gray-300\">لا توجد زيارات حديثة</div>"; return; }
+            data.visits.forEach(v => { container.innerHTML += buildVisitCard(v, false); });
+        }
+
+        function filterMarketsForUser() {
+            const filtered = appData.markets.filter(m => m.province === currentUser.province && (!currentUser.side || m.side === currentUser.side));
+            ['visit', 'stock', 'comp'].forEach(type => {
+                const optionsContainer = document.getElementById(`${type}-market-options`);
+                if(!optionsContainer) return;
+                optionsContainer.innerHTML = '';
+                if(filtered.length === 0) { optionsContainer.innerHTML = `<div class="p-3 text-center text-sm font-bold text-red-500 bg-red-50 rounded-lg m-2">لا توجد ماركتات مطابقة لمنطقتك</div>`; return; }
+                filtered.forEach(m => {
+                    const safeName = m.name.replace(/'/g, "\\'").replace(/"/g, '"');
+                    optionsContainer.innerHTML += `<div class="p-3 hover:bg-primary/10 rounded-lg cursor-pointer text-sm font-bold text-gray-700 transition-colors border-b border-gray-50 last:border-0 flex items-center gap-2" onclick="selectCustomOption('${type}', '${m.code}', '${safeName}', '${m.latitude}', '${m.longitude}')"><i class="fas fa-store text-primary/50"></i> ${m.name}</div>`;
+                });
+                optionsContainer.innerHTML += `<div id="${type}-no-results" class="no-results-msg p-3 text-center text-sm font-bold text-gray-500 hidden">لا توجد نتائج مطابقة</div>`;
+                document.getElementById(`${type}-market`).value = ''; document.getElementById(`${type}-market-display`).textContent = 'اختر الماركت...'; document.getElementById(`${type}-market-display`).classList.add('text-gray-500'); document.getElementById(`${type}-market-display`).classList.remove('text-gray-800', 'font-bold');
+            });
+        }
+
+        function toggleFab() { 
+            const menu = document.getElementById("fab-menu"); const btn = document.getElementById("fab-btn"); const overlay = document.getElementById("fab-overlay");
+            menu.classList.toggle("show"); btn.classList.toggle("active"); 
+            if(menu.classList.contains("show")) { overlay.classList.remove("hidden"); setTimeout(() => overlay.classList.remove("opacity-0"), 10); } 
+            else { overlay.classList.add("opacity-0"); setTimeout(() => overlay.classList.add("hidden"), 300); }
+        }
+
+        function navigate(screenId, checkDirty = false, navElement = null) {
+            if(checkDirty && isFormDirty) {
+                Swal.fire({title: "تنبيه!", text: "لديك بيانات لم تقم بحفظها، هل أنت متأكد من المغادرة؟", icon: "warning", showCancelButton: true}).then((result) => {
+                    if (result.isConfirmed) { isFormDirty = false; navigate(screenId, false, navElement); }
+                }); return;
+            }
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById(screenId).classList.add("active");
+            if(navElement && document.getElementById("employee-nav").contains(navElement)) { 
+                document.getElementById("employee-nav").querySelectorAll(".nav-item").forEach(n => n.classList.remove("active")); navElement.classList.add("active"); 
+            }
+            const formScreens = ['visit-screen', 'stock-screen', 'competitor-screen'];
+            if(formScreens.includes(screenId)) { document.getElementById("employee-fab").classList.add("hidden"); } 
+            else if (currentUser && (!currentUser.role.includes("مدير") && !currentUser.role.includes("الإدارة"))) { document.getElementById("employee-fab").classList.remove("hidden"); }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function markFormDirty() { isFormDirty = true; }
+
+        function openForm(type) {
+            toggleFab(); currentFormType = type; isFormDirty = false;
+            document.querySelectorAll('[id$="-market-search"]').forEach(input => { input.value = ''; filterCustomSelect(input.id.split('-')[0]); });
+            document.querySelectorAll('[id$="-dropdown"]').forEach(dd => dd.classList.add('hidden'));
+
+            if(type === "visit") {
+                document.getElementById("visit-market").value = ""; document.getElementById("visit-market-display").textContent = "اختر الماركت..."; document.getElementById("visit-market-display").classList.add('text-gray-500'); document.getElementById("visit-market-display").classList.remove('text-gray-800', 'font-bold');
+                document.getElementById("visit-reason").value = "خط سير"; document.getElementById("visit-notes").value = ""; navigate("visit-screen");
+            } else if(type === "competitor") {
+                document.getElementById("comp-market").value = ""; document.getElementById("comp-market-display").textContent = "اختر الماركت..."; document.getElementById("comp-market-display").classList.add('text-gray-500'); document.getElementById("comp-market-display").classList.remove('text-gray-800', 'font-bold');
+                document.getElementById("comp-product").value = ""; document.getElementById("comp-price").value = ""; document.getElementById("comp-origin").value = ""; document.getElementById("comp-weight").value = ""; document.getElementById("comp-carton").value = ""; document.getElementById("comp-image").value = ""; document.getElementById("comp-image-preview").src = ""; document.getElementById("comp-image-preview-container").classList.add("hidden"); document.getElementById("comp-image-placeholder").classList.remove("hidden"); currentCompetitorImageBase64 = ""; navigate("competitor-screen");
+            } else {
+                document.getElementById("stock-title").textContent = type === "daily" ? "تقرير النقوصات" : "الجرد الشهري";
+                document.getElementById("stock-market").value = ""; document.getElementById("stock-market-display").textContent = "اختر الماركت..."; document.getElementById("stock-market-display").classList.add('text-gray-500'); document.getElementById("stock-market-display").classList.remove('text-gray-800', 'font-bold');
+                document.getElementById("stock-date").value = new Date().toISOString().split("T")[0]; currentCart = []; renderCart(); navigate("stock-screen");
+            }
+        }
+
+        function validateDate() {
+            const dateInput = document.getElementById("stock-date"); const selected = new Date(dateInput.value); const today = new Date(); today.setHours(0,0,0,0);
+            if(selected > today) { Swal.fire("خطأ", "لا يمكن اختيار تاريخ في المستقبل!", "error"); dateInput.value = today.toISOString().split("T")[0]; }
+        }
+
+        function openAddProductModal() {
+            const brandOptions = document.getElementById("brand-options"); 
+            brandOptions.innerHTML = "";
+            uniqueBrands.forEach(b => {
+                const safeBrand = b.replace(/'/g, "\\'").replace(/"/g, '"');
+                brandOptions.innerHTML += `<div class="p-3 hover:bg-primary/10 rounded-lg cursor-pointer text-sm font-bold text-gray-700 transition-colors border-b border-gray-50 last:border-0" onclick="selectBrandOption('${safeBrand}')">${b}</div>`;
+            });
+            
+            document.getElementById("brand-select-display").textContent = "-- يرجى اختيار البراند --";
+            document.getElementById("brand-select-display").classList.add('text-gray-500');
+            document.getElementById("modal-brand-select").value = "";
+            
+            document.getElementById("modal-products-grid").classList.add("hidden");
+            document.getElementById("product-search-container").classList.add("hidden");
+            document.getElementById("modal-product-search").value = "";
+            
+            document.getElementById("product-modal").classList.remove("hidden"); 
+            document.getElementById("product-modal").style.display = "flex";
+        }
+        
+        function closeAddProductModal() { document.getElementById("product-modal").style.display = "none"; }
+
+        function filterBrands() {
+            const term = document.getElementById("brand-search-input").value.toLowerCase();
+            const options = document.getElementById("brand-options").children;
+            for(let opt of options) {
+                if(opt.innerText.toLowerCase().includes(term)) opt.style.display = 'block';
+                else opt.style.display = 'none';
+            }
+        }
+
+        function selectBrandOption(brand) {
+            document.getElementById("modal-brand-select").value = brand;
+            document.getElementById("brand-select-display").textContent = brand;
+            document.getElementById("brand-select-display").classList.remove('text-gray-500');
+            document.getElementById("brand-dropdown").classList.add("hidden");
+            renderModalProducts();
+        }
+
+        function filterModalProducts() {
+            const term = document.getElementById("modal-product-search").value.toLowerCase();
+            const cards = document.querySelectorAll(".modal-product-card");
+            cards.forEach(card => {
+                const name = card.getAttribute("data-name").toLowerCase();
+                if(name.includes(term)) card.style.display = "flex";
+                else card.style.display = "none";
+            });
+        }
+
+        function renderModalProducts() {
+            const brand = document.getElementById("modal-brand-select").value; const grid = document.getElementById("modal-products-grid");
+            if(!brand) { grid.classList.add("hidden"); document.getElementById("product-search-container").classList.add("hidden"); return; }
+            grid.innerHTML = ""; const filteredItems = appData.items.filter(i => i.brand === brand && !currentCart.some(c => c.code === i.code));
+            
+            if(filteredItems.length === 0) { 
+                grid.innerHTML = "<div class=\"col-span-full text-center text-sm font-bold text-primary mt-8 bg-primary/5 p-6 rounded-2xl border border-primary/20\">تمت إضافة جميع منتجات هذا البراند للفاتورة! <i class='fas fa-check-circle ml-1'></i></div>"; 
+                document.getElementById("product-search-container").classList.add("hidden");
+            } else {
+                document.getElementById("product-search-container").classList.remove("hidden");
+                filteredItems.forEach(item => {
+                    let imgSrc = getDirectImageUrl(item.image);
+                    let imgHtml = imgSrc ? `<div class="w-full aspect-square bg-white rounded-lg border border-gray-100 flex items-center justify-center mb-3 shrink-0 overflow-hidden relative"><img src="${imgSrc}" class="w-full h-full object-contain p-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 items-center justify-center bg-gray-50 text-gray-300 w-full h-full"><i class="fas fa-box text-3xl"></i></div></div>` : `<div class="w-full aspect-square bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center mb-3 shrink-0"><i class="fas fa-box text-3xl text-gray-300"></i></div>`;
+                    const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '"');
+                    grid.innerHTML += `<div class="modal-product-card border border-gray-100 rounded-2xl p-3 flex flex-col items-center text-center bg-white shadow-sm hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer h-full" data-name="${safeName}" onclick="addToCart('${item.code}')">${imgHtml}<p class="text-[12px] sm:text-sm font-bold text-gray-800 leading-snug flex-1 flex items-center justify-center w-full">${item.name}</p></div>`;
+                });
+            }
+            grid.classList.remove("hidden");
+        }
+
+        function addToCart(code) {
+            const item = appData.items.find(i => i.code === code); if(!item) return;
+            if (currentFormType === "monthly") {
+                pendingMonthlyItem = item; document.getElementById('monthly-item-name').innerText = item.name; document.getElementById('monthly-item-qty').value = '';
+                const now = new Date(); setPillValue('pill-year', now.getFullYear()); setPillValue('pill-month', now.getMonth() + 1); setPillValue('pill-day', now.getDate());
+                document.getElementById('monthly-add-modal').classList.remove('hidden'); document.getElementById('monthly-add-modal').style.display = 'flex';
+            } else { currentCart.push({ ...item, quantity: "", expiryDate: "" }); markFormDirty(); renderCart(); renderModalProducts(); }
+        }
+
+        function closeMonthlyAddModal() { document.getElementById('monthly-add-modal').style.display = 'none'; pendingMonthlyItem = null; }
+
+        function confirmMonthlyAdd() {
+            const qty = document.getElementById('monthly-item-qty').value; if(!qty || qty <= 0) { Swal.fire('تنبيه', 'يرجى إدخال كمية صحيحة.', 'warning'); return; }
+            const y = getPillValue('pill-year'); const m = String(getPillValue('pill-month')).padStart(2, '0'); const d = String(getPillValue('pill-day')).padStart(2, '0');
+            if(!y || !m || !d) { Swal.fire('تنبيه', 'يرجى تحديد تاريخ الصلاحية.', 'warning'); return; }
+            currentCart.push({ ...pendingMonthlyItem, quantity: qty, expiryDate: `${y}/${m}/${d}` });
+            closeMonthlyAddModal(); markFormDirty(); renderCart(); renderModalProducts();
+        }
+
+        function removeFromCart(code) { currentCart = currentCart.filter(c => c.code !== code); renderCart(); renderModalProducts(); }
+        
+        function renderCart() {
+            const list = document.getElementById("added-items-list"); list.innerHTML = "";
+            currentCart.forEach(item => {
+                let imgSrc = getDirectImageUrl(item.image);
+                let imgHtml = imgSrc ? `<div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden relative shadow-sm mx-auto"><img src="${imgSrc}" class="w-full h-full object-contain p-1.5" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 items-center justify-center bg-gray-50 text-gray-300 w-full h-full"><i class="fas fa-box text-2xl"></i></div></div>` : `<div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center shadow-sm mx-auto"><i class="fas fa-box text-2xl text-gray-300"></i></div>`;
+
+                let expiryBadge = ""; let qtyInput = "";
+                if (currentFormType === "monthly") {
+                    expiryBadge = `<span class="text-[9px] sm:text-[10px] text-gray-600 font-bold mt-1.5 text-center bg-gray-50 px-1 py-0.5 rounded w-full whitespace-nowrap border border-gray-200" dir="ltr"><i class="fas fa-hourglass-half text-orange-400"></i> ${item.expiryDate}</span>`;
+                    qtyInput = `<input type="number" placeholder="العدد" class="w-16 p-1.5 border border-gray-300 rounded-lg text-center text-sm font-bold focus:border-accent-color outline-none transition-colors" value="${item.quantity}" oninput="updateCartQuantity('${item.code}', this.value)">`;
+                }
+
+                list.innerHTML += `
+                    <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 mb-3 relative hover:border-gray-300 transition-colors h-full">
+                        <div class="flex flex-col items-center shrink-0 w-[85px] sm:w-[100px]">
+                            ${imgHtml}
+                            ${expiryBadge}
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0 justify-between py-0.5">
+                            <p class="text-sm sm:text-base font-bold text-gray-800 w-full leading-snug" style="word-wrap: break-word;">${item.name}</p>
+                            <div class="flex items-center justify-between mt-3">
+                                <span class="text-[11px] sm:text-xs text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-md shrink-0">${item.brand}</span>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    ${qtyInput}
+                                    <button onclick="removeFromCart('${item.code}')" class="text-danger-color bg-red-50 hover:bg-red-100 w-9 h-9 sm:w-10 sm:h-10 rounded-lg shrink-0 transition-colors flex items-center justify-center">
+                                        <i class="fas fa-trash-alt text-base"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function handleCompetitorImage(event) {
+            const file = event.target.files[0]; if (!file) return;
+            showLoading("جاري تحضير الصورة..."); 
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image(); img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement("canvas"); const MAX_WIDTH = 600; const scaleSize = MAX_WIDTH / img.width;
+                    if (img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } else { canvas.width = img.width; canvas.height = img.height; }
+                    const ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    currentCompetitorImageBase64 = canvas.toDataURL("image/jpeg", 0.6);
+                    document.getElementById("comp-image-placeholder").classList.add("hidden"); document.getElementById("comp-image-preview").src = currentCompetitorImageBase64;
+                    document.getElementById("comp-image-preview-container").classList.remove("hidden"); 
+                    hideLoading();
+                }
+            }; reader.readAsDataURL(file);
+        }
+
+        function submitFormWithReload(saveFunction, dataObj) {
+            showLoading("جاري الحفظ...");
+            if(typeof google !== "undefined") {
+                google.script.run.withSuccessHandler(() => {
+                    hideLoading(); 
+                    isFormDirty = false;
+                    Swal.fire("نجاح", "تم الحفظ بنجاح", "success").then(() => {
+                        reloadApp(); 
+                    });
+                }).withFailureHandler(showCriticalError)[saveFunction](dataObj);
+            }
+        }
+
+        function submitCompetitor() {
+            const marketInput = document.getElementById("comp-market"); const prodName = document.getElementById("comp-product").value.trim();
+            const price = document.getElementById("comp-price").value.trim(); const origin = document.getElementById("comp-origin").value.trim();
+            const weight = document.getElementById("comp-weight").value.trim(); const carton = document.getElementById("comp-carton").value.trim();
+            if(!marketInput.value || !prodName || !price || !origin || !weight || !currentCompetitorImageBase64) return Swal.fire("خطأ", "يرجى ملء جميع الحقول المطلوبة وإرفاق صورة.", "error");
+
+            const mName = marketInput.getAttribute("data-name"); const now = new Date();
+            const formattedDate = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0") + ":" + String(now.getSeconds()).padStart(2, "0");
+            const data = { employeeName: currentUser.name, province: currentUser.province, marketCode: marketInput.value, marketName: mName, date: formattedDate, productName: prodName, price: price, origin: origin, weight: weight, cartonQty: carton, imageBase64: currentCompetitorImageBase64 };
+            submitFormWithReload('saveCompetitorReport', data);
+        }
+
+        function submitVisit() {
+            const marketInput = document.getElementById("visit-market");
+            if(!marketInput.value) return Swal.fire("خطأ", "يرجى تحديد الماركت", "error");
+            const mLat = parseFloat(marketInput.getAttribute("data-lat")); const mLng = parseFloat(marketInput.getAttribute("data-lng")); const mName = marketInput.getAttribute("data-name");
+            if(isNaN(mLat) || isNaN(mLng)) return Swal.fire("خطأ", "إحداثيات الماركت غير متوفرة", "error");
+            
+            Swal.fire({title: "جاري التحقق من الموقع...", allowOutsideClick: false, didOpen: () => {Swal.showLoading()}});
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const dist = calcDistance(position.coords.latitude, position.coords.longitude, mLat, mLng);
+                        if(dist > 100) Swal.fire("أنت بعيد!", `يجب أن تكون ضمن 100 متر للتسجيل. المسافة الحالية: ${Math.round(dist)} متر.`, "error");
+                        else {
+                            const now = new Date(); const formattedDate = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0") + ":" + String(now.getSeconds()).padStart(2, "0");
+                            const data = { employeeName: currentUser.name, province: currentUser.province, marketCode: marketInput.value, marketName: mName, date: formattedDate, lat: position.coords.latitude, lng: position.coords.longitude, reason: document.getElementById("visit-reason").value, notes: document.getElementById("visit-notes").value };
+                            submitFormWithReload('saveVisitRecord', data);
+                        }
+                    },
+                    (error) => { Swal.fire("خطأ في الموقع", "يرجى السماح للمتصفح بالوصول.", "error"); }, { enableHighAccuracy: true }
+                );
+            } else Swal.fire("خطأ", "متصفحك لا يدعم الموقع.", "error");
+        }
+
+        function submitStock() {
+            const marketInput = document.getElementById("stock-market"); const dateVal = document.getElementById("stock-date").value;
+            if(!marketInput.value || currentCart.length === 0) return Swal.fire("خطأ", "الفاتورة فارغة أو الماركت غير محدد!", "error");
+            const mName = marketInput.getAttribute("data-name");
+            const commonData = { employeeName: currentUser.name, province: currentUser.province, marketCode: marketInput.value, marketName: mName, date: dateVal };
+            
+            showLoading("جاري الحفظ...");
+            if(typeof google !== "undefined") {
+                google.script.run.withSuccessHandler(() => { 
+                    hideLoading();
+                    isFormDirty = false; 
+                    Swal.fire("نجاح", "تم الحفظ بنجاح", "success").then(() => reloadApp()); 
+                }).withFailureHandler(showCriticalError).saveStockData(currentFormType, commonData, currentCart);
+            }
+        }
+
+        function calcDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; const φ1 = lat1 * Math.PI/180; const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180; const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        // ==========================================
+        //  وظائف الإدارة مع الفلاتر الذكية المتصلة
+        // ==========================================
+
+        function groupArrayByDate(arr) {
+            const groups = {};
+            arr.forEach(item => {
+                const label = getDateGroupLabel(item.date);
+                if(!groups[label]) groups[label] = [];
+                groups[label].push(item);
+            });
+            return groups;
+        }
+
+        function navigateAdmin(screenId, navElement = null) {
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById(screenId).classList.add("active");
+            if(navElement && document.getElementById("admin-nav").contains(navElement)) { 
+                document.getElementById("admin-nav").querySelectorAll(".nav-item").forEach(n => n.classList.remove("active")); navElement.classList.add("active"); 
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadAdminDashboard() {
+            showLoading("جاري جلب الإحصائيات...");
+            fetchAdminData(() => {
+                initAdminFilters(); 
+                hideLoading();
+                navigateAdmin("admin-home-screen", document.querySelector("#admin-nav .nav-item.active"));
+                
+                if(!adminRefreshInterval) {
+                    adminRefreshInterval = setInterval(() => { fetchAdminData(null, true); }, 60000); 
+                }
+            });
+        }
+
+        function fetchAdminData(callback, silent = false) {
+            if(typeof google !== "undefined") {
+                google.script.run.withSuccessHandler(data => {
+                    adminDataCache = data;
+                    updateCurrentAdminView();
+                    if(callback) callback();
+                }).withFailureHandler(err => { if(!silent) showCriticalError(err); }).getAdminDashboardData();
+            }
+        }
+
+        function updateCurrentAdminView() {
+            renderAdminHome();
+            applyAdminFilters('visits');
+            applyAdminFilters('daily');
+            applyAdminFilters('monthly');
+            if(document.getElementById('admin-employee-detail-screen').classList.contains('active')) {
+                const empName = document.getElementById('detail-emp-name').textContent.replace('ملف: ', '');
+                openEmployeeDetails(empName, true);
+            }
+        }
+
+        function renderAdminHome() {
+            const wrapper = document.getElementById("admin-employees-wrapper"); wrapper.innerHTML = "";
+            const normalEmps = appData.employees.filter(e => e.name !== "الإدارة" && !e.role.includes("مدير"));
+            
+            const groupedEmps = {};
+            normalEmps.forEach(emp => {
+                let region = emp.province === "بغداد" ? "محافظة بغداد" : "الفرات الأوسط";
+                if(!groupedEmps[region]) groupedEmps[region] = [];
+                groupedEmps[region].push(emp);
+            });
+
+            for(let region in groupedEmps) {
+                let cardsHtml = '';
+                groupedEmps[region].forEach(emp => {
+                    let latestVisit = adminDataCache.visits.find(v => v.employeeName === emp.name);
+                    let visitInfo = `<p class="text-sm text-gray-400 mt-2">لا توجد زيارات مسجلة</p>`;
+                    if (latestVisit) {
+                        const dt = formatDateTime(latestVisit.date);
+                        let timeHtml = dt.time ? `<div class="flex items-center gap-1 text-[10px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
+                        visitInfo = `
+                            <div class="mt-3 bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-right">
+                                <p class="text-xs text-gray-500 mb-1.5">آخر زيارة:</p>
+                                <p class="text-sm font-bold text-primary mb-2 leading-tight truncate"><i class="fas fa-store text-xs ml-1"></i> ${latestVisit.marketName}</p>
+                                <div class="flex items-center justify-between bg-white p-2 rounded border border-gray-100">
+                                    <div class="flex items-center gap-1 text-[10px] font-bold text-gray-700"><i class="far fa-calendar-alt text-primary"></i> <span>${dt.date}</span></div>
+                                    ${timeHtml}
+                                </div>
+                            </div>`;
+                    }
+                    let locDisplay = emp.province === "بغداد" && emp.side ? emp.side : (emp.province === "بغداد" ? "" : emp.province);
+
+                    cardsHtml += `
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer text-center" onclick="openEmployeeDetails('${emp.name}')">
+                            <div class="w-16 h-16 bg-primary/10 text-primary rounded-full mx-auto flex items-center justify-center text-2xl mb-3"><i class="fas fa-user-tie"></i></div>
+                            <h3 class="font-black text-lg text-gray-800">${emp.name}</h3>
+                            <p class="text-xs font-bold text-gray-500 mt-1">${locDisplay}</p>
+                            ${visitInfo}
+                        </div>`;
+                });
+
+                wrapper.innerHTML += `
+                    <div class="border-2 border-primary rounded-2xl p-5 pt-8 mt-10 relative shadow-sm bg-white/50">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-8 py-1.5 rounded-full font-bold text-sm shadow-md">${region}</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">${cardsHtml}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function buildDateGroupedUI(dataArray, renderCardFunction, typeArg) {
+            if(dataArray.length === 0) return "<div class='text-center text-gray-500 font-bold bg-white p-6 rounded-2xl border border-dashed'>لا توجد بيانات</div>";
+            const grouped = groupArrayByDate(dataArray);
+            let finalHtml = '';
+            for(let dateLabel in grouped) {
+                let cardsHtml = grouped[dateLabel].map(item => renderCardFunction(item, true, typeArg)).join('');
+                finalHtml += `
+                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                        <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cardsHtml}</div>
+                    </div>`;
+            }
+            return finalHtml;
+        }
+
+        function openEmployeeDetails(empName, silent = false) {
+            document.getElementById('detail-emp-name').textContent = "ملف: " + empName;
+            
+            const empVisits = adminDataCache.visits.filter(v => v.employeeName === empName).slice(0, 20);
+            const empDaily = adminDataCache.daily.filter(d => d.employeeName === empName).slice(0, 20);
+            const empMonthly = adminDataCache.monthly.filter(m => m.employeeName === empName).slice(0, 20);
+
+            document.getElementById("detail-visits-wrapper").innerHTML = buildDateGroupedUI(empVisits, buildVisitCard);
+            document.getElementById("detail-daily-wrapper").innerHTML = buildDateGroupedUI(empDaily, buildStockCardSquare, 'daily');
+            document.getElementById("detail-monthly-wrapper").innerHTML = buildDateGroupedUI(empMonthly, buildStockCardSquare, 'monthly');
+
+            if(!silent) navigateAdmin('admin-employee-detail-screen');
+        }
+
+        function buildVisitCard(v, showEmpName) {
+            const dt = formatDateTime(v.date);
+            let notesText = v.notes ? v.notes.trim() : "";
+            let notesHtml = notesText !== "" ? `<div class="text-[12px] text-gray-700 bg-primary/5 p-3 rounded-xl mt-4 border border-primary italic flex gap-2"><i class="fas fa-comment-dots text-primary opacity-80 mt-0.5"></i> <span>${notesText}</span></div>` : `<div class="text-[12px] text-gray-400 bg-gray-50 p-3 rounded-xl mt-4 border border-gray-100 italic flex gap-2 justify-center items-center"><i class="fas fa-comment-slash opacity-50"></i> <span>لا تتوفر ملاحظات</span></div>`;
+            let empRow = showEmpName ? `<div class="text-base font-black text-primary mb-3 border-b border-gray-100 pb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${v.employeeName}</div>` : "";
+            let timeHtml = dt.time ? `<div class="flex items-center gap-1.5 text-[11px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
+
+            return `
+                <div class="card p-5 border-t-4 border-t-primary flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white">
+                    ${empRow}
+                    <div class="font-bold text-lg text-gray-800 mb-3"><i class="fas fa-store text-gray-400 text-sm ml-1"></i> ${v.marketName}</div>
+                    <div class="flex items-center justify-between mb-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-gray-700"><i class="far fa-calendar-alt text-primary"></i> <span>${dt.date}</span></div>
+                        ${timeHtml}
+                    </div>
+                    <div class="text-xs font-bold text-secondary-color bg-secondary-color/10 self-start px-3 py-1.5 rounded-md">السبب: ${v.reason}</div>
+                    <div class="mt-auto">${notesHtml}</div>
+                </div>`;
+        }
+
+        function buildStockCardSquare(dataObj, showEmpName, type) {
+            const dt = formatDateTime(dataObj.date);
+            const colorClass = type === 'daily' ? 'secondary-color' : 'accent-color';
+            const iconClass = type === 'daily' ? 'fa-clipboard-list' : 'fa-calendar-check';
+            
+            let empRow = showEmpName ? `<div class="text-base font-black text-${colorClass} mb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${dataObj.employeeName}</div>` : "";
+            let timeHtml = dt.time ? `<div class="flex items-center gap-1.5 text-[11px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
+
+            const reportId = `${dataObj.employeeName}_${dataObj.marketName}_${dataObj.date}`;
+
+            return `
+                <div class="card p-5 border-t-4 border-t-${colorClass} flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white cursor-pointer" onclick="openAdminReportDetail('${reportId}', '${type}')">
+                    ${empRow}
+                    <div class="font-bold text-lg text-gray-800 mb-3 line-clamp-1"><i class="fas ${iconClass} text-gray-400 text-sm ml-1"></i> ${dataObj.marketName}</div>
+                    <div class="flex items-center justify-between mb-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-gray-700"><i class="far fa-calendar-alt text-${colorClass}"></i> <span>${dt.date}</span></div>
+                        ${timeHtml}
+                    </div>
+                    <div class="mt-auto flex justify-end">
+                        <span class="text-xs font-bold text-${colorClass} bg-${colorClass}/10 px-3 py-1.5 rounded-lg border border-${colorClass}/20">عدد المواد: ${dataObj.items.length}</span>
+                    </div>
+                </div>`;
+        }
+
+        function openAdminReportDetail(reportId, type) {
+            previousAdminScreen = document.querySelector('.screen.active').id;
+            const targetArray = type === 'daily' ? adminDataCache.daily : adminDataCache.monthly;
+            const reportData = targetArray.find(d => `${d.employeeName}_${d.marketName}_${d.date}` === reportId);
+            
+            if(!reportData) return Swal.fire("خطأ", "لم يتم العثور على الفاتورة", "error");
+
+            document.getElementById('report-detail-title').textContent = type === 'daily' ? "تفاصيل تقرير النقوصات" : "تفاصيل الجرد الشهري";
+            
+            const dt = formatDateTime(reportData.date);
+            document.getElementById('report-detail-info').innerHTML = `
+                <div>
+                    <h3 class="font-black text-lg text-gray-800"><i class="fas fa-store text-gray-400 ml-1"></i> ${reportData.marketName}</h3>
+                    <p class="text-sm font-bold text-gray-500 mt-1"><i class="fas fa-user-tie text-primary ml-1"></i> ${reportData.employeeName}</p>
+                </div>
+                <div class="text-left">
+                    <p class="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded mb-1">${dt.date}</p>
+                    <p class="text-[10px] font-black text-gray-500" dir="ltr">${dt.time}</p>
+                </div>
+            `;
+
+            const itemsGrid = document.getElementById('report-detail-items');
+            itemsGrid.innerHTML = "";
+
+            reportData.items.forEach(i => {
+                let matchedItem = appData.items.find(item => item.code === i.itemCode); 
+                let imgSrc = matchedItem ? getDirectImageUrl(matchedItem.image) : null;
+                let imgHtml = imgSrc ? `<div class="w-full aspect-square bg-white rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden relative shadow-sm mx-auto"><img src="${imgSrc}" class="w-full h-full object-contain p-1.5" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 items-center justify-center bg-gray-50 text-gray-300 w-full h-full"><i class="fas fa-box text-2xl"></i></div></div>` : `<div class="w-full aspect-square bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center shadow-sm mx-auto"><i class="fas fa-box text-3xl text-gray-300"></i></div>`;
+                
+                let expiryBadge = "";
+                let qtyBadge = "";
+                let actionBtns = `<button onclick="adminDeleteStock('${type === 'daily' ? 'Daily Stock' : 'Monthly Stock'}', ${i.rowIndex})" class="text-red-500 bg-red-50 hover:bg-red-100 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0"><i class="fas fa-trash-alt text-sm"></i></button>`;
+
+                if(type === 'monthly') {
+                    expiryBadge = `<span class="text-[10px] text-gray-600 font-bold mt-1.5 text-center bg-gray-50 px-1 py-0.5 rounded w-full border border-gray-200" dir="ltr"><i class="fas fa-hourglass-half text-orange-400"></i> ${i.expiryDate || 'N/A'}</span>`;
+                    qtyBadge = `<div class="bg-gray-100 text-gray-800 font-black px-2 py-1 rounded text-sm">${i.quantity}</div>`;
+                    actionBtns = `<button onclick="adminEditMonthlyStock(${i.rowIndex}, ${i.quantity}, '${i.expiryDate || ''}')" class="text-blue-500 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0"><i class="fas fa-pen text-xs"></i></button>${actionBtns}`;
+                }
+
+                itemsGrid.innerHTML += `
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 relative hover:shadow-md transition-shadow flex flex-col h-full">
+                        <div class="flex flex-col items-center shrink-0 w-full mb-2">
+                            ${imgHtml}
+                            ${expiryBadge}
+                        </div>
+                        <p class="text-sm font-bold text-gray-800 w-full leading-snug break-words text-center flex-1">${i.itemName}</p>
+                        <div class="w-full border-t border-gray-100 mt-2 pt-2 flex flex-col gap-2">
+                            <span class="text-[10px] text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-md text-center">${i.brand}</span>
+                            <div class="flex items-center justify-between w-full">
+                                ${qtyBadge}
+                                <div class="flex items-center gap-1">${actionBtns}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            itemsGrid.innerHTML += `
+                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition min-h-[180px]" 
+                     onclick="openAdminAddItemModal('${type}', '${reportData.employeeName}', '${reportData.province}', '${reportData.marketCode}', '${reportData.marketName}', '${reportData.date}')">
+                    <i class="fas fa-plus text-3xl text-gray-400 mb-2"></i>
+                    <p class="text-sm text-gray-600 font-bold">إضافة صنف</p>
+                </div>
+            `;
+
+            navigateAdmin('admin-report-details-screen');
+        }
+
+        function initAdminFilters() {
+            ['visits', 'daily', 'monthly'].forEach(type => {
+                const provSel = document.getElementById(`filter-${type}-prov`);
+                if(provSel) {
+                    const provs = [...new Set(appData.markets.map(m => m.province).filter(Boolean))];
+                    provSel.innerHTML = '<option value="">كل المحافظات</option>' + provs.map(p => `<option value="${p}">${p}</option>`).join('');
+                }
+                onFilterChange(type, 'init'); 
+            });
+        }
+
+        function syncDateTo(type) {
+            const fromEl = document.getElementById(`filter-${type}-date-from`);
+            const toEl = document.getElementById(`filter-${type}-date-to`);
+            if(fromEl.value && !toEl.value) {
+                toEl.value = fromEl.value;
+            }
+        }
+
+        function isDateInRange(recordDate, fromVal, toVal) {
+            if(!fromVal && !toVal) return true;
+            let d = new Date(String(recordDate).replace(" ", "T"));
+            if(isNaN(d)) d = new Date(String(recordDate).replace(/-/g, '/'));
+            if(isNaN(d)) {
+                let parts = String(recordDate).split(' ')[0].split('/');
+                if(parts.length === 3) d = new Date(`${parts[0]}/${parts[1]}/${parts[2]}`);
+            }
+            if(isNaN(d)) return true; 
+            
+            d.setHours(0,0,0,0);
+            const timeD = d.getTime();
+            
+            if(fromVal) {
+                const f = new Date(fromVal); f.setHours(0,0,0,0);
+                if(timeD < f.getTime()) return false;
+            }
+            if(toVal) {
+                const t = new Date(toVal); t.setHours(0,0,0,0);
+                if(timeD > t.getTime()) return false;
+            }
+            return true;
+        }
+
+        function highlightActiveFilters(type) {
+            const elements = ['prov', 'emp', 'market', 'reason', 'date-from', 'date-to'];
+            elements.forEach(id => {
+                const el = document.getElementById(`filter-${type}-${id}`);
+                if(el) {
+                    let lbl = document.getElementById(`label-${type}-${id}`);
+                    if(el.value) {
+                        el.classList.add('bg-primary/10', 'border-primary', 'text-primary');
+                        el.classList.remove('bg-white', 'border-gray-100');
+                        if(lbl) {
+                            lbl.classList.add('text-primary');
+                            lbl.classList.remove('text-gray-500');
+                        }
+                    } else {
+                        el.classList.remove('bg-primary/10', 'border-primary', 'text-primary');
+                        el.classList.add('bg-white', 'border-gray-100');
+                        if(lbl) {
+                            lbl.classList.remove('text-primary');
+                            lbl.classList.add('text-gray-500');
+                        }
+                    }
+                }
+            });
+        }
+
+        function clearAdminFilters(type) {
+            const ids = ['prov', 'emp', 'market', 'reason', 'date-from', 'date-to'];
+            ids.forEach(id => {
+                const el = document.getElementById(`filter-${type}-${id}`);
+                if(el) el.value = '';
+            });
+            onFilterChange(type, 'clear');
+        }
+
+        function onFilterChange(type, source) {
+            const provSel = document.getElementById(`filter-${type}-prov`);
+            const empSel = document.getElementById(`filter-${type}-emp`);
+            const marketSel = document.getElementById(`filter-${type}-market`);
+
+            if (source === 'emp' && empSel && empSel.value) {
+                const e = appData.employees.find(x => x.name === empSel.value);
+                if (e && provSel) provSel.value = e.province;
+            }
+            if (source === 'market' && marketSel && marketSel.value) {
+                const m = appData.markets.find(x => x.name === marketSel.value);
+                if (m && provSel) provSel.value = m.province;
+            }
+
+            const provVal = provSel ? provSel.value : '';
+            const empVal = empSel ? empSel.value : '';
+            const marketVal = marketSel ? marketSel.value : '';
+
+            let validEmps = appData.employees.filter(e => e.name !== "الإدارة" && !e.role.includes("مدير"));
+            let validMarkets = appData.markets;
+
+            if (provVal) {
+                validEmps = validEmps.filter(e => e.province === provVal);
+                validMarkets = validMarkets.filter(m => m.province === provVal);
+            }
+
+            if(empSel) {
+                empSel.innerHTML = '<option value="">كل المندوبين</option>' + validEmps.map(e => `<option value="${e.name}">${e.name}</option>`).join('');
+                if (validEmps.some(e => e.name === empVal)) empSel.value = empVal;
+            }
+            
+            if(marketSel) {
+                marketSel.innerHTML = '<option value="">كل الماركتات</option>' + validMarkets.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+                if (validMarkets.some(m => m.name === marketVal)) marketSel.value = marketVal;
+            }
+
+            highlightActiveFilters(type);
+            applyAdminFilters(type);
+        }
+
+        function applyAdminFilters(type) {
+            if(!adminDataCache.visits) return;
+            
+            if (type === 'visits' || !type) {
+                const vProv = document.getElementById('filter-visits-prov').value;
+                const vEmp = document.getElementById('filter-visits-emp').value;
+                const vMarket = document.getElementById('filter-visits-market').value;
+                const vReason = document.getElementById('filter-visits-reason').value;
+                const vFrom = document.getElementById('filter-visits-date-from').value;
+                const vTo = document.getElementById('filter-visits-date-to').value;
+
+                let fVisits = adminDataCache.visits;
+                if(vProv) fVisits = fVisits.filter(x => {
+                    const emp = appData.employees.find(e => e.name === x.employeeName);
+                    return emp && emp.province === vProv;
+                });
+                if(vEmp) fVisits = fVisits.filter(x => x.employeeName === vEmp);
+                if(vMarket) fVisits = fVisits.filter(x => x.marketName === vMarket);
+                if(vReason) fVisits = fVisits.filter(x => x.reason === vReason);
+                fVisits = fVisits.filter(x => isDateInRange(x.date, vFrom, vTo));
+
+                document.getElementById("admin-all-visits-container").innerHTML = buildDateGroupedUI(fVisits.slice(0, 100), buildVisitCard);
+            }
+
+            if (type === 'daily' || !type) {
+                const dProv = document.getElementById('filter-daily-prov').value;
+                const dEmp = document.getElementById('filter-daily-emp').value;
+                const dMarket = document.getElementById('filter-daily-market').value;
+                const dFrom = document.getElementById('filter-daily-date-from').value;
+                const dTo = document.getElementById('filter-daily-date-to').value;
+
+                let fDaily = adminDataCache.daily;
+                if(dProv) fDaily = fDaily.filter(x => x.province === dProv);
+                if(dEmp) fDaily = fDaily.filter(x => x.employeeName === dEmp);
+                if(dMarket) fDaily = fDaily.filter(x => x.marketName === dMarket);
+                fDaily = fDaily.filter(x => isDateInRange(x.date, dFrom, dTo));
+
+                document.getElementById("admin-all-daily-container").innerHTML = buildDateGroupedUI(fDaily.slice(0, 100), buildStockCardSquare, 'daily');
+            }
+
+            if (type === 'monthly' || !type) {
+                const mProv = document.getElementById('filter-monthly-prov').value;
+                const mEmp = document.getElementById('filter-monthly-emp').value;
+                const mMarket = document.getElementById('filter-monthly-market').value;
+                const mFrom = document.getElementById('filter-monthly-date-from').value;
+                const mTo = document.getElementById('filter-monthly-date-to').value;
+
+                let fMonthly = adminDataCache.monthly;
+                if(mProv) fMonthly = fMonthly.filter(x => x.province === mProv);
+                if(mEmp) fMonthly = fMonthly.filter(x => x.employeeName === mEmp);
+                if(mMarket) fMonthly = fMonthly.filter(x => x.marketName === mMarket);
+                fMonthly = fMonthly.filter(x => isDateInRange(x.date, mFrom, mTo));
+
+                document.getElementById("admin-all-monthly-container").innerHTML = buildDateGroupedUI(fMonthly.slice(0, 100), buildStockCardSquare, 'monthly');
+            }
+        }
+
+        function openAdminAddItemModal(type, empName, province, marketCode, marketName, dateVal) {
+            adminAddContext = { type, employeeName: empName, province, marketCode, marketName, date: dateVal };
+            const brandSelect = document.getElementById("admin-modal-brand"); brandSelect.innerHTML = "<option value=\"\">اختر البراند...</option>";
+            uniqueBrands.forEach(b => brandSelect.innerHTML += `<option value="${b}">${b}</option>`);
+            document.getElementById("admin-modal-item").innerHTML = "<option value=\"\">اختر المنتج...</option>"; document.getElementById("admin-modal-qty").value = "";
+            if (type === "monthly") document.getElementById("admin-modal-qty-container").classList.remove("hidden"); else document.getElementById("admin-modal-qty-container").classList.add("hidden");
+            document.getElementById("admin-add-item-modal").classList.remove("hidden"); document.getElementById("admin-add-item-modal").style.display = "flex";
+        }
+        function closeAdminAddItemModal() { document.getElementById("admin-add-item-modal").style.display = "none"; }
+        function renderAdminModalItems() {
+            const brand = document.getElementById("admin-modal-brand").value; const itemSelect = document.getElementById("admin-modal-item"); itemSelect.innerHTML = "<option value=\"\">اختر المنتج...</option>";
+            if(!brand) return; const filteredItems = appData.items.filter(i => i.brand === brand);
+            filteredItems.forEach(item => { itemSelect.innerHTML += `<option value="${item.code}">${item.name}</option>`; });
+        }
+        
+        function submitAdminNewItem() {
+            const itemCode = document.getElementById("admin-modal-item").value; const qty = document.getElementById("admin-modal-qty").value;
+            if (!itemCode) return Swal.fire("خطأ", "يرجى اختيار المنتج", "error");
+            if (adminAddContext.type === "monthly" && !qty) return Swal.fire("خطأ", "يرجى إدخال الكمية", "error");
+            const itemDetails = appData.items.find(i => i.code === itemCode);
+            adminAddContext.itemCode = itemCode; adminAddContext.itemName = itemDetails.name; adminAddContext.brand = itemDetails.brand; adminAddContext.quantity = qty;
+            
+            closeAdminAddItemModal();
+            submitFormWithReload('adminAddSingleStockItem', adminAddContext);
+        }
+
+        function adminDeleteStock(sheetName, rowIndex) {
+            Swal.fire({title: "حذف العنصر؟", icon: "warning", showCancelButton: true, confirmButtonColor: "#ef4444"}).then(r => {
+                if(r.isConfirmed) { submitFormWithReload('deleteRecord', rowIndex); }
+            });
+        }
+
+        function adminEditMonthlyStock(rowIndex, oldQty, oldExp) {
+            let expVal = oldExp === 'غير محدد' ? '' : oldExp;
+            
+            Swal.fire({
+                title: 'تعديل بيانات المادة',
+                html: `
+                    <div class="text-right mb-2"><label class="text-sm font-bold text-gray-700">الكمية:</label></div>
+                    <input id="swal-input-qty" type="number" class="swal2-input !mt-0 !mb-4 !w-[90%]" value="${oldQty}">
+                    <div class="text-right mb-2"><label class="text-sm font-bold text-gray-700">تاريخ الصلاحية (اختياري):</label></div>
+                    <input id="swal-input-exp" type="text" class="swal2-input !mt-0 !w-[90%]" value="${expVal}" placeholder="مثال: 2026/05/12" dir="ltr">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'حفظ التعديلات',
+                cancelButtonText: 'إلغاء',
+                preConfirm: () => {
+                    const qty = document.getElementById('swal-input-qty').value;
+                    const exp = document.getElementById('swal-input-exp').value;
+                    if(!qty) { Swal.showValidationMessage('الكمية مطلوبة'); return false; }
+                    return { qty: qty, exp: exp };
+                }
+            }).then(result => {
+                if(result.isConfirmed) {
+                    showLoading("جاري التعديل...");
+                    if(typeof google !== "undefined") { 
+                        google.script.run.withSuccessHandler(() => { 
+                            hideLoading(); 
+                            Swal.fire("نجاح", "تم التعديل", "success").then(() => reloadApp()); 
+                        }).withFailureHandler(showCriticalError).updateStockItem(rowIndex, result.value.qty, result.value.exp); 
+                    }
+                }
+            });
+        }
+
+        startApp();
     </script>
-  </body>
+</body>
 </html>
