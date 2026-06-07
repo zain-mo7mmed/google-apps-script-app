@@ -192,7 +192,7 @@ function getAdminDashboardData() {
     let addedDailyMarkets = new Set();
     if(dailySheet) {
       const dData = dailySheet.getDataRange().getDisplayValues();
-      for(let i = dData.length - 1; i > Math.max(0, dData.length - 150); i--) {
+      for(let i = dData.length - 1; i > 0; i--) {
         if(!dData[i][0]) continue;
         let marketDateKey = dData[i][0] + '_' + dData[i][3] + '_' + dData[i][4];
         if(!addedDailyMarkets.has(marketDateKey)) {
@@ -212,7 +212,7 @@ function getAdminDashboardData() {
     let addedMonthlyMarkets = new Set();
     if(monthlySheet) {
       const mData = monthlySheet.getDataRange().getDisplayValues();
-      for(let i = mData.length - 1; i > Math.max(0, mData.length - 150); i--) {
+      for(let i = mData.length - 1; i > 0; i--) {
         if(!mData[i][0]) continue;
         let marketDateKey = mData[i][0] + '_' + mData[i][3] + '_' + mData[i][4];
         if(!addedMonthlyMarkets.has(marketDateKey)) {

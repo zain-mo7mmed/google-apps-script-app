@@ -1602,9 +1602,9 @@
             document.getElementById('detail-emp-name').textContent = "ملف: " + empName;
             if(!silent) activeEmployeeDetailTab = 'visits';
             
-            const empVisits = adminDataCache.visits.filter(v => v.employeeName === empName).slice(0, 20);
-            const empDaily = adminDataCache.daily.filter(d => d.employeeName === empName).slice(0, 20);
-            const empMonthly = adminDataCache.monthly.filter(m => m.employeeName === empName).slice(0, 20);
+            const empVisits = adminDataCache.visits.filter(v => v.employeeName === empName);
+            const empDaily = adminDataCache.daily.filter(d => d.employeeName === empName);
+            const empMonthly = adminDataCache.monthly.filter(m => m.employeeName === empName);
 
             document.getElementById("detail-visits-wrapper").innerHTML = buildAdminVisitsGroupedUI(empVisits);
             document.getElementById("detail-daily-wrapper").innerHTML = buildDateGroupedUI(empDaily, buildStockCardSquare, 'daily');
@@ -1640,7 +1640,7 @@
             const colorClass = type === 'daily' ? 'secondary-color' : 'accent-color';
             const iconClass = type === 'daily' ? 'fa-clipboard-list' : 'fa-calendar-check';
             
-            let empRow = showEmpName ? `<div class="text-base font-black text-${colorClass} mb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${dataObj.employeeName}</div>` : "";
+            let empRow = showEmpName ? `<div class="mb-2"><div class="text-base font-black text-${colorClass}"><i class="fas fa-user-tie text-sm ml-1"></i> ${dataObj.employeeName}</div>${type === 'daily' && dataObj.province ? `<div class="text-[11px] font-bold text-gray-400 mt-1"><i class="fas fa-map-marker-alt ml-1"></i>${dataObj.province}</div>` : ''}</div>` : "";
             let timeHtml = dt.time ? `<div class="flex items-center gap-1.5 text-[11px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
 
             const reportId = `${dataObj.employeeName}_${dataObj.marketName}_${dataObj.date}`;
@@ -1880,7 +1880,7 @@
                 if(dMarket) fDaily = fDaily.filter(x => x.marketName === dMarket);
                 fDaily = fDaily.filter(x => isDateInRange(x.date, dFrom, dTo));
 
-                document.getElementById("admin-all-daily-container").innerHTML = buildDateGroupedUI(fDaily.slice(0, 100), buildStockCardSquare, 'daily');
+                document.getElementById("admin-all-daily-container").innerHTML = buildDateGroupedUI(fDaily, buildStockCardSquare, 'daily');
             }
 
             if (type === 'monthly' || !type) {
@@ -1896,7 +1896,7 @@
                 if(mMarket) fMonthly = fMonthly.filter(x => x.marketName === mMarket);
                 fMonthly = fMonthly.filter(x => isDateInRange(x.date, mFrom, mTo));
 
-                document.getElementById("admin-all-monthly-container").innerHTML = buildDateGroupedUI(fMonthly.slice(0, 100), buildStockCardSquare, 'monthly');
+                document.getElementById("admin-all-monthly-container").innerHTML = buildDateGroupedUI(fMonthly, buildStockCardSquare, 'monthly');
             }
         }
 
