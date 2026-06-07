@@ -930,6 +930,14 @@
             closeMonthlyAddModal(); markFormDirty(); renderCart(); renderModalProducts();
         }
 
+        function updateCartQuantity(code, value) {
+            const item = currentCart.find(c => c.code === code);
+            if(item) {
+                item.quantity = value;
+                markFormDirty();
+            }
+        }
+
         function removeFromCart(code) { currentCart = currentCart.filter(c => c.code !== code); renderCart(); renderModalProducts(); }
         
         function renderCart() {
@@ -945,19 +953,19 @@
                 }
 
                 list.innerHTML += `
-                    <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 mb-3 relative hover:border-gray-300 transition-colors h-full">
-                        <div class="flex flex-col items-center shrink-0 w-[85px] sm:w-[100px]">
+                    <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 mb-3 hover:border-gray-300 transition-colors h-full overflow-hidden">
+                        <div class="flex flex-col items-center shrink-0 w-[78px] sm:w-[96px]">
                             ${imgHtml}
                             ${expiryBadge}
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0 justify-between py-0.5">
+                        <div class="flex flex-col flex-1 min-w-0 justify-between py-0.5 overflow-hidden">
                             <p class="text-sm sm:text-base font-bold text-gray-800 w-full leading-snug" style="word-wrap: break-word;">${item.name}</p>
-                            <div class="flex items-center justify-between mt-3">
-                                <span class="text-[11px] sm:text-xs text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-md shrink-0">${item.brand}</span>
-                                <div class="flex items-center gap-2 shrink-0">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mt-3">
+                                <span class="text-[11px] sm:text-xs text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-md min-w-0 max-w-full truncate">${item.brand}</span>
+                                <div class="flex items-center gap-2 shrink-0 max-w-full">
                                     ${qtyInput}
-                                    <button onclick="removeFromCart('${item.code}')" class="text-danger-color bg-red-50 hover:bg-red-100 w-9 h-9 sm:w-10 sm:h-10 rounded-lg shrink-0 transition-colors flex items-center justify-center">
-                                        <i class="fas fa-trash-alt text-base"></i>
+                                    <button onclick="removeFromCart('${item.code}')" class="text-danger-color bg-red-50 hover:bg-red-100 w-9 h-9 rounded-lg shrink-0 transition-colors flex items-center justify-center">
+                                        <i class="fas fa-trash-alt text-sm"></i>
                                     </button>
                                 </div>
                             </div>
@@ -1176,6 +1184,69 @@
             return finalHtml;
         }
 
+        function buildAdminVisitsGroupedUI(dataArray) {
+            if(dataArray.length === 0) return "<div class='text-center text-gray-500 font-bold bg-white p-6 rounded-2xl border border-dashed'>لا توجد بيانات</div>";
+            const groupedByDate = groupArrayByDate(dataArray);
+            let finalHtml = '';
+
+            for(let dateLabel in groupedByDate) {
+                const employeeGroups = {};
+                groupedByDate[dateLabel].forEach(visit => {
+                    const key = visit.employeeName || 'غير محدد';
+                    if(!employeeGroups[key]) employeeGroups[key] = [];
+                    employeeGroups[key].push(visit);
+                });
+
+                const cardsHtml = Object.keys(employeeGroups).map(employeeName => {
+                    return buildAdminVisitSummaryCard(employeeName, employeeGroups[employeeName]);
+                }).join('');
+
+                finalHtml += `
+                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                        <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${cardsHtml}</div>
+                    </div>`;
+            }
+            return finalHtml;
+        }
+
+        function buildAdminVisitSummaryCard(employeeName, visits) {
+            const visitRows = visits.map(v => {
+                const dt = formatDateTime(v.date);
+                const timeText = dt.time || 'بدون وقت';
+                const notesText = v.notes && v.notes.trim() ? v.notes.trim() : '';
+                const notesHtml = notesText ? `<p class="text-[11px] text-gray-500 mt-1 leading-relaxed"><i class="fas fa-comment-dots text-primary/60 ml-1"></i>${notesText}</p>` : '';
+
+                return `
+                    <div class="bg-gray-50 border border-gray-100 rounded-xl p-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0 text-right">
+                                <p class="text-sm font-black text-gray-800 truncate"><i class="fas fa-store text-primary/60 ml-1"></i>${v.marketName}</p>
+                                <p class="text-[11px] font-bold text-secondary-color mt-1">السبب: ${v.reason || 'غير محدد'}</p>
+                            </div>
+                            <div class="shrink-0 text-[11px] font-black text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg" dir="ltr">
+                                <i class="far fa-clock text-gray-400"></i> ${timeText}
+                            </div>
+                        </div>
+                        ${notesHtml}
+                    </div>`;
+            }).join('');
+
+            return `
+                <div class="card p-5 border-t-4 border-t-primary flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white">
+                    <div class="flex items-start justify-between gap-3 mb-4 border-b border-gray-100 pb-3">
+                        <div class="min-w-0">
+                            <h3 class="text-base font-black text-primary truncate"><i class="fas fa-user-tie text-sm ml-1"></i>${employeeName}</h3>
+                            <p class="text-xs font-bold text-gray-400 mt-1">زيارات هذا اليوم</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-black text-primary bg-primary/10 border border-primary/15 px-3 py-1.5 rounded-full">
+                            ${visits.length} ${visits.length === 1 ? 'زيارة' : 'زيارات'}
+                        </span>
+                    </div>
+                    <div class="space-y-2">${visitRows}</div>
+                </div>`;
+        }
+
         function openEmployeeDetails(empName, silent = false) {
             document.getElementById('detail-emp-name').textContent = "ملف: " + empName;
             
@@ -1183,7 +1254,7 @@
             const empDaily = adminDataCache.daily.filter(d => d.employeeName === empName).slice(0, 20);
             const empMonthly = adminDataCache.monthly.filter(m => m.employeeName === empName).slice(0, 20);
 
-            document.getElementById("detail-visits-wrapper").innerHTML = buildDateGroupedUI(empVisits, buildVisitCard);
+            document.getElementById("detail-visits-wrapper").innerHTML = buildAdminVisitsGroupedUI(empVisits);
             document.getElementById("detail-daily-wrapper").innerHTML = buildDateGroupedUI(empDaily, buildStockCardSquare, 'daily');
             document.getElementById("detail-monthly-wrapper").innerHTML = buildDateGroupedUI(empMonthly, buildStockCardSquare, 'monthly');
 
@@ -1439,7 +1510,7 @@
                 if(vReason) fVisits = fVisits.filter(x => x.reason === vReason);
                 fVisits = fVisits.filter(x => isDateInRange(x.date, vFrom, vTo));
 
-                document.getElementById("admin-all-visits-container").innerHTML = buildDateGroupedUI(fVisits.slice(0, 100), buildVisitCard);
+                document.getElementById("admin-all-visits-container").innerHTML = buildAdminVisitsGroupedUI(fVisits.slice(0, 100));
             }
 
             if (type === 'daily' || !type) {
