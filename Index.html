@@ -208,6 +208,28 @@
             line-height: 1;
         }
 
+        .visit-reason-badge.order {
+            border-color: rgba(16, 185, 129, 0.16);
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .visit-reason-badge.order i {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .visit-reason-badge.route {
+            border-color: rgba(3, 105, 161, 0.12);
+            background: #eff6ff;
+            color: var(--secondary-color);
+        }
+
+        .visit-reason-badge.route i {
+            background: #dbeafe;
+            color: var(--secondary-color);
+        }
+
         .visit-reason-badge i {
             display: grid;
             place-items: center;
@@ -227,6 +249,128 @@
             transform: translateY(-1px);
             border-color: rgba(15, 118, 110, 0.22);
             background: #ffffff;
+        }
+
+        .admin-screen {
+            padding-top: 10px;
+        }
+
+        .admin-screen.active::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 98px;
+            z-index: 50;
+            pointer-events: none;
+            background: linear-gradient(180deg, var(--bg-color) 0%, rgba(246, 248, 251, 0.92) 62%, rgba(246, 248, 251, 0) 100%);
+        }
+
+        .admin-header {
+            position: sticky;
+            top: 10px;
+            z-index: 55;
+            margin: 0 12px 18px;
+            padding: 14px 16px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+            color: #ffffff;
+            box-shadow: 0 16px 34px rgba(15, 118, 110, 0.24);
+        }
+
+        #filters-visits,
+        #filters-daily,
+        #filters-monthly {
+            position: relative;
+            z-index: 52;
+            margin-inline: 12px;
+            border-radius: 18px;
+            border: 1px solid var(--line-color);
+        }
+
+        .admin-header h2,
+        .admin-header button,
+        .admin-header i {
+            color: #ffffff !important;
+        }
+
+        .admin-header button {
+            background: rgba(255, 255, 255, 0.16) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        .admin-header button:hover {
+            background: rgba(255, 255, 255, 0.24) !important;
+        }
+
+        .admin-section-frame {
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px 14px 14px;
+            margin-top: 24px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.72);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .section-label {
+            position: absolute;
+            top: -12px;
+            right: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            background: #475569;
+            color: #ffffff;
+            padding: 5px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 8px 20px rgba(71, 85, 105, 0.18);
+        }
+
+        .detail-tabs {
+            position: sticky;
+            top: 82px;
+            z-index: 46;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin: 0 12px 14px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .detail-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 40px;
+            border-radius: 13px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 800;
+            transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .detail-tab.active {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+        }
+
+        .detail-tab:active {
+            transform: scale(0.98);
+        }
+
+        .detail-panel.hidden {
+            display: none;
         }
 
         @media (max-width: 640px) {
@@ -435,16 +579,16 @@
             </div>
         </div>
 
-        <div id="admin-home-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+        <div id="admin-home-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex justify-between items-center">
                 <h2 class="text-xl font-bold text-primary"><i class="fas fa-users mr-2"></i> فريق العمل</h2>
                 <button onclick="handleLogout()" class="text-danger-color font-bold text-sm bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors"><i class="fas fa-sign-out-alt"></i> خروج</button>
             </div>
             <div class="p-4 md:p-0 pb-20" id="admin-employees-wrapper"></div>
         </div>
 
-        <div id="admin-visits-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl relative">
+        <div id="admin-visits-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex justify-between items-center relative">
                 <h2 class="text-xl font-bold text-primary"><i class="fas fa-route mr-2"></i> سجل الزيارات</h2>
                 <button onclick="document.getElementById('filters-visits').classList.toggle('hidden')" class="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-primary/20"><i class="fas fa-filter"></i> تصفية</button>
             </div>
@@ -469,8 +613,8 @@
             <div class="p-4 md:p-0 pb-20" id="admin-all-visits-container"></div>
         </div>
 
-        <div id="admin-daily-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+        <div id="admin-daily-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex justify-between items-center">
                 <h2 class="text-xl font-bold text-secondary-color"><i class="fas fa-clipboard-list mr-2"></i> تقارير النقوصات</h2>
                 <button onclick="document.getElementById('filters-daily').classList.toggle('hidden')" class="bg-secondary-color/10 text-secondary-color px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-secondary-color/20"><i class="fas fa-filter"></i> تصفية</button>
             </div>
@@ -494,8 +638,8 @@
             <div class="p-4 md:p-0 pb-20" id="admin-all-daily-container"></div>
         </div>
 
-        <div id="admin-monthly-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex justify-between items-center md:rounded-b-2xl mb-4">
+        <div id="admin-monthly-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex justify-between items-center">
                 <h2 class="text-xl font-bold text-accent-color"><i class="fas fa-calendar-check mr-2"></i> الجرد الشهري</h2>
                 <button onclick="document.getElementById('filters-monthly').classList.toggle('hidden')" class="bg-accent-color/10 text-accent-color px-3 py-1.5 rounded-lg text-sm font-bold transition-colors hover:bg-accent-color/20"><i class="fas fa-filter"></i> تصفية</button>
             </div>
@@ -519,22 +663,25 @@
             <div class="p-4 md:p-0 pb-20" id="admin-all-monthly-container"></div>
         </div>
 
-        <div id="admin-employee-detail-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center gap-3 md:rounded-b-2xl mb-4">
+        <div id="admin-employee-detail-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex items-center gap-3">
                 <button onclick="navigateAdmin('admin-home-screen')" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
                 <h2 class="text-xl font-bold" id="detail-emp-name">ملف الموظف</h2>
             </div>
-            <div class="p-4 md:p-0 space-y-8 pb-20">
-                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-route text-primary ml-1"></i> الزيارات</h3><div id="detail-visits-wrapper"></div></div>
-                <hr class="border-gray-200">
-                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-clipboard-list text-secondary-color ml-1"></i> النقوصات</h3><div id="detail-daily-wrapper"></div></div>
-                <hr class="border-gray-200">
-                <div><h3 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-calendar-check text-accent-color ml-1"></i> الجرد الشهري</h3><div id="detail-monthly-wrapper"></div></div>
+            <div class="detail-tabs">
+                <button type="button" class="detail-tab active" data-detail-tab="visits" onclick="switchEmployeeDetailTab('visits')"><i class="fas fa-route"></i> الزيارات</button>
+                <button type="button" class="detail-tab" data-detail-tab="daily" onclick="switchEmployeeDetailTab('daily')"><i class="fas fa-clipboard-list"></i> النقوصات</button>
+                <button type="button" class="detail-tab" data-detail-tab="monthly" onclick="switchEmployeeDetailTab('monthly')"><i class="fas fa-calendar-check"></i> الجرد</button>
+            </div>
+            <div class="p-4 md:p-0 pb-20">
+                <div id="detail-panel-visits" class="detail-panel"><div id="detail-visits-wrapper"></div></div>
+                <div id="detail-panel-daily" class="detail-panel hidden"><div id="detail-daily-wrapper"></div></div>
+                <div id="detail-panel-monthly" class="detail-panel hidden"><div id="detail-monthly-wrapper"></div></div>
             </div>
         </div>
 
-        <div id="admin-report-details-screen" class="screen min-h-screen">
-            <div class="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center justify-between md:rounded-b-2xl mb-4">
+        <div id="admin-report-details-screen" class="screen min-h-screen admin-screen">
+            <div class="admin-header flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <button onclick="navigateAdmin(previousAdminScreen)" class="text-gray-500 hover:text-primary transition-colors"><i class="fas fa-arrow-right text-xl"></i></button>
                     <h2 class="text-xl font-bold" id="report-detail-title">تفاصيل الفاتورة</h2>
@@ -664,6 +811,7 @@
         let pendingMonthlyItem = null;
         let adminRefreshInterval = null;
         let previousAdminScreen = 'admin-home-screen'; 
+        let activeEmployeeDetailTab = 'visits';
 
         function showLoading(text) {
             const loader = document.getElementById("loader");
@@ -830,6 +978,7 @@
             try {
                 if(!dateStr) return { date: "", time: "" };
                 let str = String(dateStr).trim();
+                const hasExplicitTime = /(?:^|\s|T)\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M|\s?[ap]m|\s?ص|\s?م)?/.test(str);
                 let d = new Date(str);
                 
                 if (isNaN(d)) d = new Date(str.replace(/-/g, '/'));
@@ -846,16 +995,30 @@
 
                 const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0');
                 
-                let hasTime = str.includes(":") || str.includes("T") || (d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0);
                 let timeStr = "";
                 
-                if(hasTime) {
+                if(hasExplicitTime) {
                     let h = d.getHours(); const min = String(d.getMinutes()).padStart(2, "0");
                     const ampm = h >= 12 ? "م" : "ص"; h = h % 12; h = h ? h : 12;
                     timeStr = `${h}:${min} ${ampm}`;
                 }
                 return { date: `${y}/${m}/${day}`, time: timeStr, rawObj: d };
             } catch(e) { return { date: String(dateStr), time: "", rawObj: null }; }
+        }
+
+        function getVisitReasonBadgeClass(reason) {
+            return String(reason || '').includes('طلب') ? 'order' : 'route';
+        }
+
+        function switchEmployeeDetailTab(tab) {
+            activeEmployeeDetailTab = tab;
+            document.querySelectorAll('.detail-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-detail-tab') === tab);
+            });
+            ['visits', 'daily', 'monthly'].forEach(name => {
+                const panel = document.getElementById(`detail-panel-${name}`);
+                if(panel) panel.classList.toggle('hidden', name !== tab);
+            });
         }
 
         function getDateGroupLabel(dateObjStr) {
@@ -1341,8 +1504,8 @@
                 });
 
                 wrapper.innerHTML += `
-                    <div class="border-2 border-primary rounded-2xl p-5 pt-8 mt-10 relative shadow-sm bg-white/50">
-                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-8 py-1.5 rounded-full font-bold text-sm shadow-md">${region}</div>
+                    <div class="admin-section-frame">
+                        <div class="section-label"><i class="fas fa-layer-group"></i> ${region}</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">${cardsHtml}</div>
                     </div>
                 `;
@@ -1356,8 +1519,8 @@
             for(let dateLabel in grouped) {
                 let cardsHtml = grouped[dateLabel].map(item => renderCardFunction(item, true, typeArg)).join('');
                 finalHtml += `
-                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
-                        <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
+                    <div class="admin-section-frame">
+                        <div class="section-label"><i class="far fa-calendar-alt"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
             }
@@ -1382,8 +1545,8 @@
                 }).join('');
 
                 finalHtml += `
-                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
-                        <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
+                    <div class="admin-section-frame">
+                        <div class="section-label"><i class="far fa-calendar-alt"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
             }
@@ -1396,13 +1559,14 @@
                 const timeText = dt.time || 'بدون وقت';
                 const notesText = v.notes && v.notes.trim() ? v.notes.trim() : '';
                 const notesHtml = notesText ? `<p class="text-[11px] text-gray-500 mt-1 leading-relaxed"><i class="fas fa-comment-dots text-primary/60 ml-1"></i>${notesText}</p>` : '';
+                const reasonClass = getVisitReasonBadgeClass(v.reason);
 
                 return `
                     <div class="visit-mini-row bg-gray-50 border border-gray-100 rounded-xl p-3">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0 text-right">
                                 <p class="text-sm font-black text-gray-800 truncate"><i class="fas fa-store text-primary/60 ml-1"></i>${v.marketName}</p>
-                                <span class="visit-reason-badge mt-2"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
+                                <span class="visit-reason-badge ${reasonClass} mt-2"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
                             </div>
                             <div class="shrink-0 text-[11px] font-black text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg" dir="ltr">
                                 <i class="far fa-clock text-gray-400"></i> ${timeText}
@@ -1428,6 +1592,7 @@
 
         function openEmployeeDetails(empName, silent = false) {
             document.getElementById('detail-emp-name').textContent = "ملف: " + empName;
+            if(!silent) activeEmployeeDetailTab = 'visits';
             
             const empVisits = adminDataCache.visits.filter(v => v.employeeName === empName).slice(0, 20);
             const empDaily = adminDataCache.daily.filter(d => d.employeeName === empName).slice(0, 20);
@@ -1436,6 +1601,7 @@
             document.getElementById("detail-visits-wrapper").innerHTML = buildAdminVisitsGroupedUI(empVisits);
             document.getElementById("detail-daily-wrapper").innerHTML = buildDateGroupedUI(empDaily, buildStockCardSquare, 'daily');
             document.getElementById("detail-monthly-wrapper").innerHTML = buildDateGroupedUI(empMonthly, buildStockCardSquare, 'monthly');
+            switchEmployeeDetailTab(activeEmployeeDetailTab);
 
             if(!silent) navigateAdmin('admin-employee-detail-screen');
         }
@@ -1446,6 +1612,7 @@
             let notesHtml = notesText !== "" ? `<div class="text-[12px] text-gray-700 bg-primary/5 p-3 rounded-xl mt-4 border border-primary/20 flex gap-2 leading-relaxed"><i class="fas fa-comment-dots text-primary opacity-80 mt-0.5"></i> <span>${notesText}</span></div>` : `<div class="text-[12px] text-gray-400 bg-gray-50 p-3 rounded-xl mt-4 border border-gray-100 flex gap-2 justify-center items-center"><i class="fas fa-comment-slash opacity-50"></i> <span>لا تتوفر ملاحظات</span></div>`;
             let empRow = showEmpName ? `<div class="text-[15px] font-black text-primary mb-3 border-b border-gray-100 pb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${v.employeeName}</div>` : "";
             let timeHtml = dt.time ? `<div class="flex items-center gap-1.5 text-[11px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
+            const reasonClass = getVisitReasonBadgeClass(v.reason);
 
             return `
                 <div class="card p-4 border-t-4 border-t-primary flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white">
@@ -1455,7 +1622,7 @@
                         <div class="flex items-center gap-1.5 text-xs font-bold text-gray-700"><i class="far fa-calendar-alt text-primary"></i> <span>${dt.date}</span></div>
                         ${timeHtml}
                     </div>
-                    <span class="visit-reason-badge"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
+                    <span class="visit-reason-badge ${reasonClass}"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
                     <div class="mt-auto">${notesHtml}</div>
                 </div>`;
         }
