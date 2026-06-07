@@ -68,6 +68,186 @@
         .pill-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 8px; padding: 5px 10px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
         .pill-btn { flex-shrink: 0; scroll-snap-align: center; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; background: white; color: #64748b; border: 1px solid #e2e8f0; transition: all 0.2s ease; cursor: pointer; }
         .pill-btn.selected { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.3); transform: scale(1.05); }
+
+        /* Professional mobile-first polish */
+        :root {
+            --primary-color: #0f766e;
+            --primary-light: #0d9488;
+            --primary-soft: #ecfdf5;
+            --secondary-color: #0369a1;
+            --accent-color: #d97706;
+            --danger-color: #dc2626;
+            --bg-color: #f6f8fb;
+            --card-bg: #ffffff;
+            --text-main: #18212f;
+            --text-muted: #64748b;
+            --line-color: #e6edf5;
+            --soft-shadow: 0 8px 26px rgba(15, 23, 42, 0.055);
+            --card-radius: 14px;
+            --control-radius: 11px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-size: 14px;
+            line-height: 1.65;
+            letter-spacing: 0;
+            background:
+                radial-gradient(circle at top right, rgba(20, 184, 166, 0.07), transparent 28rem),
+                var(--bg-color);
+        }
+
+        #app-wrapper { padding-bottom: 86px; }
+
+        .screen > .sticky {
+            top: 0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .screen > .bg-primary.sticky {
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+            border-bottom: 0;
+            border-bottom-left-radius: 22px;
+            border-bottom-right-radius: 22px;
+        }
+
+        .screen > .bg-white.shadow-sm.sticky {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+        }
+
+        .screen h2 { font-size: 18px; font-weight: 800; letter-spacing: 0; }
+        .screen h3 { font-size: 16px; font-weight: 800; letter-spacing: 0; }
+
+        .card {
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: var(--card-radius);
+            box-shadow: var(--soft-shadow);
+            overflow-wrap: anywhere;
+        }
+
+        .input-field {
+            min-height: 46px;
+            border-color: var(--line-color);
+            border-radius: var(--control-radius);
+            background: #fbfdff;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-field:focus {
+            border-color: rgba(15, 118, 110, 0.55);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.09);
+        }
+
+        label { color: #334155; font-size: 13px; font-weight: 700; }
+
+        .btn-primary {
+            border-radius: var(--control-radius);
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 10px 22px rgba(15, 118, 110, 0.18);
+        }
+
+        .btn-primary:active { transform: translateY(1px) scale(0.99); }
+
+        .bottom-nav {
+            max-width: 560px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            padding: 9px 10px;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 22px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+        }
+
+        .nav-item {
+            min-width: 70px;
+            padding: 5px 8px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { background: var(--primary-soft); color: var(--primary-color); }
+
+        .fab-container { bottom: 88px; }
+        .fab-button {
+            width: 56px;
+            height: 56px;
+            font-size: 21px;
+            box-shadow: 0 14px 28px rgba(15, 118, 110, 0.28);
+        }
+
+        .fab-item {
+            border: 1px solid var(--line-color);
+            border-radius: 16px;
+            padding: 11px 16px;
+            font-size: 13px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .visit-reason-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            align-self: flex-start;
+            border: 1px solid rgba(3, 105, 161, 0.12);
+            border-radius: 999px;
+            background: #eff6ff;
+            color: var(--secondary-color);
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .visit-reason-badge i {
+            display: grid;
+            place-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: var(--secondary-color);
+            font-size: 10px;
+        }
+
+        .visit-mini-row {
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .visit-mini-row:hover {
+            transform: translateY(-1px);
+            border-color: rgba(15, 118, 110, 0.22);
+            background: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+            body { font-size: 13.5px; }
+            .card { padding: 14px; }
+            .screen > .bg-primary.sticky { padding: 20px 18px; }
+            .screen > .bg-white.shadow-sm.sticky { padding: 13px 16px; }
+            .screen h2 { font-size: 17px; }
+            .screen h3 { font-size: 15px; }
+            .input-field { min-height: 44px; font-size: 13.5px; }
+            .bottom-nav { left: 8px; right: 8px; bottom: 8px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body class="md:px-4 lg:px-8">
@@ -1176,7 +1356,7 @@
             for(let dateLabel in grouped) {
                 let cardsHtml = grouped[dateLabel].map(item => renderCardFunction(item, true, typeArg)).join('');
                 finalHtml += `
-                    <div class="border border-gray-800 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
                         <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
@@ -1202,7 +1382,7 @@
                 }).join('');
 
                 finalHtml += `
-                    <div class="border border-gray-800 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
                         <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
@@ -1218,11 +1398,11 @@
                 const notesHtml = notesText ? `<p class="text-[11px] text-gray-500 mt-1 leading-relaxed"><i class="fas fa-comment-dots text-primary/60 ml-1"></i>${notesText}</p>` : '';
 
                 return `
-                    <div class="bg-gray-50 border border-gray-100 rounded-xl p-3">
+                    <div class="visit-mini-row bg-gray-50 border border-gray-100 rounded-xl p-3">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0 text-right">
                                 <p class="text-sm font-black text-gray-800 truncate"><i class="fas fa-store text-primary/60 ml-1"></i>${v.marketName}</p>
-                                <p class="text-[11px] font-bold text-secondary-color mt-1">السبب: ${v.reason || 'غير محدد'}</p>
+                                <span class="visit-reason-badge mt-2"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
                             </div>
                             <div class="shrink-0 text-[11px] font-black text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg" dir="ltr">
                                 <i class="far fa-clock text-gray-400"></i> ${timeText}
@@ -1263,19 +1443,19 @@
         function buildVisitCard(v, showEmpName) {
             const dt = formatDateTime(v.date);
             let notesText = v.notes ? v.notes.trim() : "";
-            let notesHtml = notesText !== "" ? `<div class="text-[12px] text-gray-700 bg-primary/5 p-3 rounded-xl mt-4 border border-primary italic flex gap-2"><i class="fas fa-comment-dots text-primary opacity-80 mt-0.5"></i> <span>${notesText}</span></div>` : `<div class="text-[12px] text-gray-400 bg-gray-50 p-3 rounded-xl mt-4 border border-gray-100 italic flex gap-2 justify-center items-center"><i class="fas fa-comment-slash opacity-50"></i> <span>لا تتوفر ملاحظات</span></div>`;
-            let empRow = showEmpName ? `<div class="text-base font-black text-primary mb-3 border-b border-gray-100 pb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${v.employeeName}</div>` : "";
+            let notesHtml = notesText !== "" ? `<div class="text-[12px] text-gray-700 bg-primary/5 p-3 rounded-xl mt-4 border border-primary/20 flex gap-2 leading-relaxed"><i class="fas fa-comment-dots text-primary opacity-80 mt-0.5"></i> <span>${notesText}</span></div>` : `<div class="text-[12px] text-gray-400 bg-gray-50 p-3 rounded-xl mt-4 border border-gray-100 flex gap-2 justify-center items-center"><i class="fas fa-comment-slash opacity-50"></i> <span>لا تتوفر ملاحظات</span></div>`;
+            let empRow = showEmpName ? `<div class="text-[15px] font-black text-primary mb-3 border-b border-gray-100 pb-2"><i class="fas fa-user-tie text-sm ml-1"></i> ${v.employeeName}</div>` : "";
             let timeHtml = dt.time ? `<div class="flex items-center gap-1.5 text-[11px] font-black text-gray-500" dir="ltr"><i class="far fa-clock text-gray-400"></i> <span>${dt.time}</span></div>` : ``;
 
             return `
-                <div class="card p-5 border-t-4 border-t-primary flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white">
+                <div class="card p-4 border-t-4 border-t-primary flex flex-col shadow-sm h-full hover:shadow-md transition-shadow bg-white">
                     ${empRow}
-                    <div class="font-bold text-lg text-gray-800 mb-3"><i class="fas fa-store text-gray-400 text-sm ml-1"></i> ${v.marketName}</div>
-                    <div class="flex items-center justify-between mb-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                    <div class="font-black text-[15px] text-gray-800 mb-3 leading-snug"><i class="fas fa-store text-primary/55 text-sm ml-1"></i> ${v.marketName}</div>
+                    <div class="flex items-center justify-between mb-3 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-gray-700"><i class="far fa-calendar-alt text-primary"></i> <span>${dt.date}</span></div>
                         ${timeHtml}
                     </div>
-                    <div class="text-xs font-bold text-secondary-color bg-secondary-color/10 self-start px-3 py-1.5 rounded-md">السبب: ${v.reason}</div>
+                    <span class="visit-reason-badge"><i class="fas fa-circle-exclamation"></i>${v.reason || 'غير محدد'}</span>
                     <div class="mt-auto">${notesHtml}</div>
                 </div>`;
         }
