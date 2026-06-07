@@ -1245,6 +1245,7 @@
         function renderModalProducts() {
             const brand = document.getElementById("modal-brand-select").value; const grid = document.getElementById("modal-products-grid");
             if(!brand) { grid.classList.add("hidden"); document.getElementById("product-search-container").classList.add("hidden"); return; }
+            const searchTerm = document.getElementById("modal-product-search").value.toLowerCase().trim();
             grid.innerHTML = ""; const filteredItems = appData.items.filter(i => i.brand === brand && !currentCart.some(c => c.code === i.code));
             
             if(filteredItems.length === 0) { 
@@ -1256,7 +1257,8 @@
                     let imgSrc = getDirectImageUrl(item.image);
                     let imgHtml = imgSrc ? `<div class="w-full aspect-square bg-white rounded-lg border border-gray-100 flex items-center justify-center mb-3 shrink-0 overflow-hidden relative"><img src="${imgSrc}" class="w-full h-full object-contain p-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 items-center justify-center bg-gray-50 text-gray-300 w-full h-full"><i class="fas fa-box text-3xl"></i></div></div>` : `<div class="w-full aspect-square bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center mb-3 shrink-0"><i class="fas fa-box text-3xl text-gray-300"></i></div>`;
                     const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '"');
-                    grid.innerHTML += `<div class="modal-product-card border border-gray-100 rounded-2xl p-3 flex flex-col items-center text-center bg-white shadow-sm hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer h-full" data-name="${safeName}" onclick="addToCart('${item.code}')">${imgHtml}<p class="text-[12px] sm:text-sm font-bold text-gray-800 leading-snug flex-1 flex items-center justify-center w-full">${item.name}</p></div>`;
+                    const displayStyle = searchTerm && !item.name.toLowerCase().includes(searchTerm) ? 'display: none;' : '';
+                    grid.innerHTML += `<div class="modal-product-card border border-gray-100 rounded-2xl p-3 flex flex-col items-center text-center bg-white shadow-sm hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer h-full" data-name="${safeName}" style="${displayStyle}" onclick="addToCart('${item.code}')">${imgHtml}<p class="text-[12px] sm:text-sm font-bold text-gray-800 leading-snug flex-1 flex items-center justify-center w-full">${item.name}</p></div>`;
                 });
             }
             grid.classList.remove("hidden");
