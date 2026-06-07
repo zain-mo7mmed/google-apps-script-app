@@ -1176,7 +1176,7 @@
             for(let dateLabel in grouped) {
                 let cardsHtml = grouped[dateLabel].map(item => renderCardFunction(item, true, typeArg)).join('');
                 finalHtml += `
-                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                    <div class="border border-gray-800 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
                         <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
@@ -1202,7 +1202,7 @@
                 }).join('');
 
                 finalHtml += `
-                    <div class="border border-gray-200 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
+                    <div class="border border-gray-800 rounded-2xl p-4 pt-6 mt-8 relative bg-white shadow-sm">
                         <div class="absolute -top-3 right-6 bg-gray-600 text-white px-5 py-1 rounded-full font-bold text-xs shadow-md"><i class="far fa-calendar-alt ml-1"></i> ${dateLabel}</div>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${cardsHtml}</div>
                     </div>`;
@@ -1237,7 +1237,6 @@
                     <div class="flex items-start justify-between gap-3 mb-4 border-b border-gray-100 pb-3">
                         <div class="min-w-0">
                             <h3 class="text-base font-black text-primary truncate"><i class="fas fa-user-tie text-sm ml-1"></i>${employeeName}</h3>
-                            <p class="text-xs font-bold text-gray-400 mt-1">زيارات هذا اليوم</p>
                         </div>
                         <span class="shrink-0 text-xs font-black text-primary bg-primary/10 border border-primary/15 px-3 py-1.5 rounded-full">
                             ${visits.length} ${visits.length === 1 ? 'زيارة' : 'زيارات'}
