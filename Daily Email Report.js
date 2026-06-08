@@ -154,86 +154,81 @@ function generateAndSendDailyReport() {
   // 8. بناء محتوى الإيميل HTML
   const reportUrl = newReportFile.getUrl();
   const emailHtml = `
-    <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; max-width: 760px; margin: 0 auto; background-color: #f8fafc; border: 1px solid #e5e7eb; border-radius: 18px; overflow: hidden;">
+    <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; max-width: 650px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
       
       <!-- رأس الإيميل -->
-      <div style="background-color: #ffffff; padding: 24px 28px 20px; border-top: 5px solid #0f766e; border-bottom: 1px solid #e5e7eb;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="vertical-align: middle;">
-              <h1 style="margin: 0 0 8px; font-size: 24px; line-height: 1.3; font-weight: 800; color: #0f172a;">تقرير النقوصات اليومي</h1>
-              <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">${fullDateAr}</p>
-            </td>
-            <td style="vertical-align: middle; text-align: left; width: 96px;">
-              <img src="${companyLogoUrl}" width="82" style="display: block; margin-right: auto;" alt="Al-Farah Logo">
-            </td>
-          </tr>
-        </table>
+      <div style="background-color: #0f766e; padding: 25px 20px; text-align: center; color: white;">
+        <h1 style="margin: 0; font-size: 26px; font-weight: bold; letter-spacing: 0.5px;">تقرير النقوصات</h1>
+        <div style="display: inline-block; background: rgba(255,255,255,0.15); padding: 6px 18px; border-radius: 20px; font-size: 13px; margin-top: 12px; letter-spacing: 0.5px;">${fullDateAr}</div>
       </div>
       
       <!-- جسم الإيميل -->
-      <div style="padding: 28px; line-height: 1.75; background-color: #ffffff;">
-        <p style="margin: 0 0 10px; font-weight: 800; font-size: 16px; color: #111827;">السادة المحترمون،</p>
-        <p style="margin: 0 0 22px; color: #475569; font-size: 14px;">تحية طيبة، مرفق أدناه ملخص تقرير النقوصات اليومي حسب المحافظة والماركت والمروّج.</p>
+      <div style="padding: 30px 25px; line-height: 1.7; background-color: #ffffff;">
+        <p style="margin-top: 0; font-weight: bold; font-size: 17px; color: #111827;">السادة المحترمون،</p>
+        <p style="margin-bottom: 20px; color: #4b5563;">تحية طيبة..</p>
+        <p style="color: #374151;">إليكم التقرير اليومي لنقوصات الماركتات ليوم أمس، فقد تم رصد الأصناف التابعة لشركة الفرح العالمية المتواجدة في الأسواق، وكان نصيب كل ماركت من التوزيع كالآتي:</p>
         
         <!-- جدول الملخص -->
-        <table style="width: 100%; border-collapse: collapse; margin: 24px 0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin: 25px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
           <thead>
             <tr style="background-color: #f8fafc;">
-              <th style="padding: 12px 10px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #475569; font-size: 12px; width: 14%;">المحافظة</th>
-              <th style="padding: 12px 10px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #475569; font-size: 12px; width: 28%;">إسم الماركت</th>
-              <th style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; color: #0f766e; font-size: 12px; width: 16%;">المتوفر</th>
-              <th style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; color: #dc2626; font-size: 12px; width: 16%;">المفقود</th>
-              <th style="padding: 12px 10px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #475569; font-size: 12px; width: 26%;">إسم المروّج</th>
+              <th style="padding: 12px 10px; text-align: right; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; width: 15%;">المحافظة</th>
+              <th style="padding: 12px 10px; text-align: right; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; width: 30%;">إسم الماركت</th>
+              <th style="padding: 12px 10px; text-align: center; border-bottom: 2px solid #e2e8f0; color: #0f766e; font-size: 13px; width: 15%;">الأصناف المتوفرة</th>
+              <th style="padding: 12px 10px; text-align: center; border-bottom: 2px solid #e2e8f0; color: #ef4444; font-size: 13px; width: 15%;">الأصناف المفقودة</th>
+              <th style="padding: 12px 10px; text-align: right; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; width: 25%;">إسم المروّج</th>
             </tr>
           </thead>
           <tbody>
             ${summaryList.map((m, index) => `
-              <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#fbfdff'};">
-                <td style="padding: 12px 10px; border-bottom: 1px solid #edf2f7; color: #0f766e; font-size: 13px; font-weight: 700;">${m.province || "-"}</td>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #edf2f7; color: #1f2937; font-size: 13px; font-weight: 700;">${m.name}</td>
-                <td style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #edf2f7; font-size: 13px; font-weight: 800; color: #0f766e;">${m.count}</td>
-                <td style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #edf2f7; font-size: 13px; font-weight: 800; color: #dc2626;">${m.missing}</td>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #edf2f7; color: #64748b; font-size: 13px; font-weight: 600;">${m.promoter}</td>
+              <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                <td style="padding: 12px 10px; border-bottom: 1px solid #e2e8f0; color: #0f766e; font-weight: 600;">${m.province || "-"}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #e2e8f0; color: #1f2937; font-weight: 600;">${m.name}</td>
+                <td style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #0f766e;">${m.count}</td>
+                <td style="padding: 12px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #ef4444;">${m.missing}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #e2e8f0; color: #64748b;">${m.promoter}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
 
-        <p style="color: #475569; font-size: 14px; margin: 0;">يمكنكم الاطلاع على التقرير الكامل من خلال الرابط التالي:</p>
+        <p style="color: #374151;">يمكنكم الإطلاع على التقرير الكامل عبر الرابط أدناه:</p>
         
         <!-- زر فتح الملف -->
-        <div style="text-align: center; margin: 28px 0 8px;">
-          <a href="${reportUrl}" style="background-color: #0f766e; color: white; padding: 13px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; font-size: 14px; display: inline-block;">
-            عرض تقرير النقوصات
+        <div style="text-align: center; margin: 35px 0;">
+          <a href="${reportUrl}" style="background-color: #16a34a; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.25);">
+            <span style="font-size: 18px;">📊</span> عرض تقرير النقوصات
           </a>
         </div>
 
-        <p style="color: #64748b; margin: 24px 0 0; font-size: 13px;">مع فائق الود والتقدير،</p>
+        <p style="color: #4b5563; margin-bottom: 5px;">مع فائق الود والتقدير،</p>
       </div>
 
       <!-- التوقيع الاحترافي -->
-      <div style="background-color: #f8fafc; padding: 22px 28px; border-top: 1px solid #e2e8f0;">
+      <div style="background-color: #f8fafc; padding: 25px; border-top: 1px solid #e2e8f0;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td style="vertical-align: top;">
-              <p style="margin: 0 0 4px; font-weight: 800; color: #0f172a; font-size: 16px;">زين محمد</p>
-              <p style="margin: 0 0 14px; font-size: 12px; color: #64748b; font-weight: 600;">مطور نظم برمجية</p>
+            <td style="vertical-align: top; padding-right: 15px;">
+              <p style="margin: 0 0 5px 0; font-weight: 900; color: #0f766e; font-size: 18px; letter-spacing: 0.5px;">زين محمد</p>
+              <p style="margin: 0 0 15px 0; font-size: 13px; color: #64748b; font-weight: 600;">مطور نظم برمجية</p>
               
-              <table style="font-size: 12px; color: #475569; border-collapse: separate; border-spacing: 0 6px;">
+              <table style="font-size: 13px; color: #475569; border-collapse: separate; border-spacing: 0 6px;">
                 <tr>
-                  <td style="width: 52px; color: #94a3b8; font-weight: 700;">هاتف</td>
+                  <td style="width: 20px; color: #0f766e;">📞</td>
                   <td><a href="tel:+9647767798799" style="color: #475569; text-decoration: none;">+964 776 779 8799</a></td>
                 </tr>
                 <tr>
-                  <td style="width: 52px; color: #94a3b8; font-weight: 700;">بريد</td>
+                  <td style="width: 20px; color: #0f766e;">✉️</td>
                   <td><a href="mailto:zmohammed@alfarah.com.iq" style="color: #475569; text-decoration: none;">zmohammed@alfarah.com.iq</a></td>
                 </tr>
                 <tr>
-                  <td style="width: 52px; color: #94a3b8; font-weight: 700;">موقع</td>
+                  <td style="width: 20px; color: #0f766e;">🌐</td>
                   <td><a href="http://www.alfarah.com.iq" style="color: #0369a1; text-decoration: none; font-weight: 600;">www.alfarah.com.iq</a></td>
                 </tr>
               </table>
+            </td>
+            <td style="vertical-align: middle; text-align: left; width: 120px;">
+              <img src="${companyLogoUrl}" width="100" style="display: block; margin-left: auto;" alt="Al-Farah Logo">
             </td>
           </tr>
         </table>
