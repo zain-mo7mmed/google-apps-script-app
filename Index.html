@@ -724,8 +724,8 @@
         <div class="nav-item" onclick="navigateAdmin('admin-monthly-screen', this)"><i class="fas fa-calendar-check text-accent-color"></i><span class="text-accent-color">الجرد</span></div>
     </div>
 
-    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden sm:flex-row flex-col justify-end sm:justify-center items-center sm:p-4">
-        <div class="bg-white w-full sm:max-w-5xl sm:rounded-3xl rounded-t-3xl p-4 sm:p-6 max-h-[90vh] flex flex-col slide-up relative">
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex-col justify-center items-center p-4">
+        <div class="bg-white w-full max-w-5xl rounded-3xl p-4 sm:p-6 max-h-[calc(100dvh-2rem)] flex flex-col slide-up relative shadow-2xl">
             <div class="flex justify-between items-center mb-5 shrink-0">
                 <h3 class="font-bold text-xl text-gray-800">اختر المنتجات</h3>
                 <button onclick="closeAddProductModal()" class="text-gray-500 text-lg w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-full"><i class="fas fa-times"></i></button>
@@ -739,14 +739,14 @@
                         <span id="brand-select-display" class="truncate text-gray-500">-- يرجى اختيار البراند --</span>
                         <i class="fas fa-chevron-down text-gray-400"></i>
                     </div>
-                    <div id="brand-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden">
+                    <div id="brand-dropdown" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 hidden flex-col overflow-hidden max-h-[42dvh]">
                         <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
                             <div class="relative">
                                 <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="brand-search-input" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold" placeholder="ابحث عن براند..." onkeyup="filterBrands()" onfocus="keepBrandDropdownVisible()">
                             </div>
                         </div>
-                        <div id="brand-options" class="max-h-48 overflow-y-auto p-2 custom-scrollbar"></div>
+                        <div id="brand-options" class="max-h-[32dvh] overflow-y-auto p-2 custom-scrollbar"></div>
                     </div>
                 </div>
 
@@ -1224,9 +1224,14 @@
             document.getElementById("modal-products-grid").classList.add("hidden");
             document.getElementById("product-search-container").classList.add("hidden");
             document.getElementById("modal-product-search").value = "";
+            document.getElementById("brand-search-input").value = "";
+            document.getElementById("brand-dropdown").classList.add("hidden");
             
-            document.getElementById("product-modal").classList.remove("hidden"); 
-            document.getElementById("product-modal").style.display = "flex";
+            const productModal = document.getElementById("product-modal");
+            const productModalContent = productModal.firstElementChild;
+            productModal.classList.remove("hidden");
+            productModal.style.display = "flex";
+            if(productModalContent) productModalContent.scrollTop = 0;
         }
         
         function closeAddProductModal() { document.getElementById("product-modal").style.display = "none"; }
