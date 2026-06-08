@@ -743,7 +743,7 @@
                         <div class="p-3 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
                             <div class="relative">
                                 <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="brand-search-input" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold" placeholder="ابحث عن براند..." onkeyup="filterBrands()">
+                                <input type="text" id="brand-search-input" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:border-primary outline-none text-sm font-bold" placeholder="ابحث عن براند..." onkeyup="filterBrands()" onfocus="keepBrandDropdownVisible()">
                             </div>
                         </div>
                         <div id="brand-options" class="max-h-48 overflow-y-auto p-2 custom-scrollbar"></div>
@@ -1064,8 +1064,24 @@
             if (isHidden) { 
                 dropdown.classList.remove('hidden'); 
                 const searchInput = document.getElementById(searchInputId);
-                if(searchInput) searchInput.focus(); 
+                if(type === 'brand') {
+                    if(searchInput) searchInput.blur();
+                    keepBrandDropdownVisible();
+                } else if(searchInput) {
+                    searchInput.focus();
+                }
             }
+        }
+
+        function keepBrandDropdownVisible() {
+            const modalContent = document.querySelector("#product-modal > div");
+            const brandDropdown = document.getElementById("brand-dropdown");
+            if(!modalContent || !brandDropdown || brandDropdown.classList.contains("hidden")) return;
+            setTimeout(() => {
+                const brandSelect = document.getElementById("brand-select-container");
+                if(brandSelect) brandSelect.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                modalContent.scrollTop = Math.max(0, modalContent.scrollTop - 8);
+            }, 80);
         }
         
         function filterCustomSelect(type) {
