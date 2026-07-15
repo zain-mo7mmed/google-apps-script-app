@@ -41,21 +41,21 @@ function generateAndSendDailyReport() {
     {
       key: "kurdistan",
       title: "تقرير كردستان",
-      filePrefix: "تقرير نقوصات كردستان",
+      fileTitle: "تقرير كردستان",
       stockIndex: stockColumns.erbil,
       provinces: ["أربيل", "اربيل", "السليمانية", "دهوك"]
     },
     {
       key: "baghdad",
       title: "تقرير بغداد",
-      filePrefix: "تقرير نقوصات بغداد",
+      fileTitle: "تقرير بغداد",
       stockIndex: stockColumns.baghdad,
       provinces: ["بغداد"]
     },
     {
       key: "middleEuphrates",
       title: "تقرير الفرات الأوسط",
-      filePrefix: "تقرير نقوصات الفرات الأوسط",
+      fileTitle: "تقرير الفرات الأوسط",
       stockIndex: stockColumns.najaf,
       provinces: ["النجف", "نجف", "الحلة", "حلة", "بابل", "كربلاء"]
     }
@@ -169,10 +169,12 @@ function generateAndSendDailyReport() {
     subject: "تقرير النقوصات اليومي - " + dateString,
     htmlBody: emailHtml
   });
+
+  cleanupOldReportFiles_(folder, 1);
 }
 
 function createRegionalDailyReportFile_(config, marketGroups, allItems, dateString, folder) {
-  const fileName = config.filePrefix + " [" + dateString + "]";
+  const fileName = "[" + dateString + "] - " + config.fileTitle;
   const newReportFile = SpreadsheetApp.create(fileName);
   const fileId = newReportFile.getId();
 
@@ -282,4 +284,17 @@ function normalizeArabicText_(value) {
 function sanitizeSheetName_(name) {
   const safeName = String(name || "Sheet").replace(/[\\\/\?\*\[\]\:]/g, "-").trim();
   return safeName.substring(0, 99) || "Sheet";
+}
+
+function cleanupOldReportFiles_(folder, monthsToKeep) {
+  const cutoffDate = new Date();
+  cutoffDate.setMonth(cutoffDate.getMonth() - monthsToKeep);
+
+  const files = folder.getFiles();
+  while (files.hasNext()) {
+    const file = files.next();
+    if (file.getDateCreated() < cutoffDate) {
+      file.setTrashed(true);
+    }
+  }
 }
