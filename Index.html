@@ -602,9 +602,9 @@
             </div>
             <div id="filters-visits" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-visits-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('visits', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-visits-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('visits', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-visits-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('visits', 'market')"><option value="">كل الماركتات</option></select>
+                    <select id="filter-visits-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-visits-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-visits-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'market')"><option value="">كل الماركتات</option></select>
                     <select id="filter-visits-reason" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('visits', 'reason')"><option value="">كل الأسباب</option><option value="خط سير">خط سير</option><option value="طلبية">طلبية</option></select>
                     
                     <div class="relative col-span-1 mt-1">
@@ -628,9 +628,9 @@
             </div>
             <div id="filters-daily" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-daily-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('daily', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-daily-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('daily', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-daily-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('daily', 'market')"><option value="">كل الماركتات</option></select>
+                    <select id="filter-daily-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-daily-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-daily-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'market')"><option value="">كل الماركتات</option></select>
                     
                     <div class="relative col-span-1 mt-1">
                         <label id="label-daily-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
@@ -653,9 +653,9 @@
             </div>
             <div id="filters-monthly" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-monthly-prov" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('monthly', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-monthly-emp" class="input-field py-2.5 text-sm font-bold transition-colors" onchange="onFilterChange('monthly', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-monthly-market" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('monthly', 'market')"><option value="">كل الماركتات</option></select>
+                    <select id="filter-monthly-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'prov')"><option value="">كل المحافظات</option></select>
+                    <select id="filter-monthly-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'emp')"><option value="">كل المندوبين</option></select>
+                    <select id="filter-monthly-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'market')"><option value="">كل الماركتات</option></select>
                     
                     <div class="relative col-span-1 mt-1">
                         <label id="label-monthly-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
@@ -1500,12 +1500,13 @@
             
             const groupedEmps = {};
             normalEmps.forEach(emp => {
-                let region = emp.province === "بغداد" ? "محافظة بغداد" : "الفرات الأوسط";
+                let region = getAdminEmployeeRegion(emp.province);
                 if(!groupedEmps[region]) groupedEmps[region] = [];
                 groupedEmps[region].push(emp);
             });
 
-            for(let region in groupedEmps) {
+            const regionOrder = ["محافظة بغداد", "كردستان", "الفرات الأوسط"];
+            regionOrder.filter(region => groupedEmps[region]).forEach(region => {
                 let cardsHtml = '';
                 groupedEmps[region].forEach(emp => {
                     let latestVisit = adminDataCache.visits.find(v => v.employeeName === emp.name);
@@ -1540,7 +1541,18 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">${cardsHtml}</div>
                     </div>
                 `;
-            }
+            });
+        }
+
+        function getAdminEmployeeRegion(province) {
+            const normalizedProvince = normalizeArabicText(province);
+            if(normalizedProvince === normalizeArabicText("بغداد")) return "محافظة بغداد";
+            if(["اربيل", "السليمانية", "دهوك"].includes(normalizedProvince)) return "كردستان";
+            return "الفرات الأوسط";
+        }
+
+        function normalizeArabicText(value) {
+            return String(value || "").trim().replace(/[أإآ]/g, "ا").replace(/\s+/g, "");
         }
 
         function buildDateGroupedUI(dataArray, renderCardFunction, typeArg) {
@@ -1753,11 +1765,41 @@
             ['visits', 'daily', 'monthly'].forEach(type => {
                 const provSel = document.getElementById(`filter-${type}-prov`);
                 if(provSel) {
-                    const provs = [...new Set(appData.markets.map(m => m.province).filter(Boolean))];
-                    provSel.innerHTML = '<option value="">كل المحافظات</option>' + provs.map(p => `<option value="${p}">${p}</option>`).join('');
+                    const employeeProvs = appData.employees
+                        .filter(e => e.name !== "الإدارة" && !e.role.includes("مدير"))
+                        .map(e => e.province);
+                    const marketProvs = appData.markets.map(m => m.province);
+                    const provs = [...new Set([...employeeProvs, ...marketProvs].filter(Boolean))];
+                    setMultiSelectOptions(provSel, 'كل المحافظات', provs);
                 }
                 onFilterChange(type, 'init'); 
             });
+        }
+
+        function getSelectedValues(selectEl) {
+            if(!selectEl) return [];
+            return Array.from(selectEl.selectedOptions).map(opt => opt.value).filter(Boolean);
+        }
+
+        function hasAnySelectedValue(selectEl) {
+            return getSelectedValues(selectEl).length > 0;
+        }
+
+        function setMultiSelectOptions(selectEl, allLabel, values, selectedValues = []) {
+            const selectedSet = new Set(selectedValues);
+            selectEl.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>` + values.map(value => {
+                const selected = selectedSet.has(value) ? ' selected' : '';
+                const safeValue = escapeHtml(value);
+                return `<option value="${safeValue}"${selected}>${safeValue}</option>`;
+            }).join('');
+        }
+
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/"/g, "&quot;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
         }
 
         function syncDateTo(type) {
@@ -1798,7 +1840,8 @@
                 const el = document.getElementById(`filter-${type}-${id}`);
                 if(el) {
                     let lbl = document.getElementById(`label-${type}-${id}`);
-                    if(el.value) {
+                    const isActive = el.multiple ? hasAnySelectedValue(el) : !!el.value;
+                    if(isActive) {
                         el.classList.add('bg-primary/10', 'border-primary', 'text-primary');
                         el.classList.remove('bg-white', 'border-gray-100');
                         if(lbl) {
@@ -1821,7 +1864,8 @@
             const ids = ['prov', 'emp', 'market', 'reason', 'date-from', 'date-to'];
             ids.forEach(id => {
                 const el = document.getElementById(`filter-${type}-${id}`);
-                if(el) el.value = '';
+                if(el && el.multiple) Array.from(el.options).forEach(opt => opt.selected = false);
+                else if(el) el.value = '';
             });
             onFilterChange(type, 'clear');
         }
@@ -1831,35 +1875,26 @@
             const empSel = document.getElementById(`filter-${type}-emp`);
             const marketSel = document.getElementById(`filter-${type}-market`);
 
-            if (source === 'emp' && empSel && empSel.value) {
-                const e = appData.employees.find(x => x.name === empSel.value);
-                if (e && provSel) provSel.value = e.province;
-            }
-            if (source === 'market' && marketSel && marketSel.value) {
-                const m = appData.markets.find(x => x.name === marketSel.value);
-                if (m && provSel) provSel.value = m.province;
-            }
-
-            const provVal = provSel ? provSel.value : '';
-            const empVal = empSel ? empSel.value : '';
-            const marketVal = marketSel ? marketSel.value : '';
+            const provVals = getSelectedValues(provSel);
+            const empVals = getSelectedValues(empSel);
+            const marketVals = getSelectedValues(marketSel);
 
             let validEmps = appData.employees.filter(e => e.name !== "الإدارة" && !e.role.includes("مدير"));
             let validMarkets = appData.markets;
 
-            if (provVal) {
-                validEmps = validEmps.filter(e => e.province === provVal);
-                validMarkets = validMarkets.filter(m => m.province === provVal);
+            if (provVals.length > 0) {
+                validEmps = validEmps.filter(e => provVals.includes(e.province));
+                validMarkets = validMarkets.filter(m => provVals.includes(m.province));
             }
 
             if(empSel) {
-                empSel.innerHTML = '<option value="">كل المندوبين</option>' + validEmps.map(e => `<option value="${e.name}">${e.name}</option>`).join('');
-                if (validEmps.some(e => e.name === empVal)) empSel.value = empVal;
+                const validEmpNames = validEmps.map(e => e.name);
+                setMultiSelectOptions(empSel, 'كل المندوبين', validEmpNames, empVals.filter(name => validEmpNames.includes(name)));
             }
             
             if(marketSel) {
-                marketSel.innerHTML = '<option value="">كل الماركتات</option>' + validMarkets.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-                if (validMarkets.some(m => m.name === marketVal)) marketSel.value = marketVal;
+                const validMarketNames = validMarkets.map(m => m.name);
+                setMultiSelectOptions(marketSel, 'كل الماركتات', validMarketNames, marketVals.filter(name => validMarketNames.includes(name)));
             }
 
             highlightActiveFilters(type);
@@ -1870,20 +1905,20 @@
             if(!adminDataCache.visits) return;
             
             if (type === 'visits' || !type) {
-                const vProv = document.getElementById('filter-visits-prov').value;
-                const vEmp = document.getElementById('filter-visits-emp').value;
-                const vMarket = document.getElementById('filter-visits-market').value;
+                const vProv = getSelectedValues(document.getElementById('filter-visits-prov'));
+                const vEmp = getSelectedValues(document.getElementById('filter-visits-emp'));
+                const vMarket = getSelectedValues(document.getElementById('filter-visits-market'));
                 const vReason = document.getElementById('filter-visits-reason').value;
                 const vFrom = document.getElementById('filter-visits-date-from').value;
                 const vTo = document.getElementById('filter-visits-date-to').value;
 
                 let fVisits = adminDataCache.visits;
-                if(vProv) fVisits = fVisits.filter(x => {
+                if(vProv.length > 0) fVisits = fVisits.filter(x => {
                     const emp = appData.employees.find(e => e.name === x.employeeName);
-                    return emp && emp.province === vProv;
+                    return vProv.includes(x.province) || (emp && vProv.includes(emp.province));
                 });
-                if(vEmp) fVisits = fVisits.filter(x => x.employeeName === vEmp);
-                if(vMarket) fVisits = fVisits.filter(x => x.marketName === vMarket);
+                if(vEmp.length > 0) fVisits = fVisits.filter(x => vEmp.includes(x.employeeName));
+                if(vMarket.length > 0) fVisits = fVisits.filter(x => vMarket.includes(x.marketName));
                 if(vReason) fVisits = fVisits.filter(x => x.reason === vReason);
                 fVisits = fVisits.filter(x => isDateInRange(x.date, vFrom, vTo));
 
@@ -1891,32 +1926,32 @@
             }
 
             if (type === 'daily' || !type) {
-                const dProv = document.getElementById('filter-daily-prov').value;
-                const dEmp = document.getElementById('filter-daily-emp').value;
-                const dMarket = document.getElementById('filter-daily-market').value;
+                const dProv = getSelectedValues(document.getElementById('filter-daily-prov'));
+                const dEmp = getSelectedValues(document.getElementById('filter-daily-emp'));
+                const dMarket = getSelectedValues(document.getElementById('filter-daily-market'));
                 const dFrom = document.getElementById('filter-daily-date-from').value;
                 const dTo = document.getElementById('filter-daily-date-to').value;
 
                 let fDaily = adminDataCache.daily;
-                if(dProv) fDaily = fDaily.filter(x => x.province === dProv);
-                if(dEmp) fDaily = fDaily.filter(x => x.employeeName === dEmp);
-                if(dMarket) fDaily = fDaily.filter(x => x.marketName === dMarket);
+                if(dProv.length > 0) fDaily = fDaily.filter(x => dProv.includes(x.province));
+                if(dEmp.length > 0) fDaily = fDaily.filter(x => dEmp.includes(x.employeeName));
+                if(dMarket.length > 0) fDaily = fDaily.filter(x => dMarket.includes(x.marketName));
                 fDaily = fDaily.filter(x => isDateInRange(x.date, dFrom, dTo));
 
                 document.getElementById("admin-all-daily-container").innerHTML = buildDateGroupedUI(fDaily, buildStockCardSquare, 'daily');
             }
 
             if (type === 'monthly' || !type) {
-                const mProv = document.getElementById('filter-monthly-prov').value;
-                const mEmp = document.getElementById('filter-monthly-emp').value;
-                const mMarket = document.getElementById('filter-monthly-market').value;
+                const mProv = getSelectedValues(document.getElementById('filter-monthly-prov'));
+                const mEmp = getSelectedValues(document.getElementById('filter-monthly-emp'));
+                const mMarket = getSelectedValues(document.getElementById('filter-monthly-market'));
                 const mFrom = document.getElementById('filter-monthly-date-from').value;
                 const mTo = document.getElementById('filter-monthly-date-to').value;
 
                 let fMonthly = adminDataCache.monthly;
-                if(mProv) fMonthly = fMonthly.filter(x => x.province === mProv);
-                if(mEmp) fMonthly = fMonthly.filter(x => x.employeeName === mEmp);
-                if(mMarket) fMonthly = fMonthly.filter(x => x.marketName === mMarket);
+                if(mProv.length > 0) fMonthly = fMonthly.filter(x => mProv.includes(x.province));
+                if(mEmp.length > 0) fMonthly = fMonthly.filter(x => mEmp.includes(x.employeeName));
+                if(mMarket.length > 0) fMonthly = fMonthly.filter(x => mMarket.includes(x.marketName));
                 fMonthly = fMonthly.filter(x => isDateInRange(x.date, mFrom, mTo));
 
                 document.getElementById("admin-all-monthly-container").innerHTML = buildDateGroupedUI(fMonthly, buildStockCardSquare, 'monthly');
