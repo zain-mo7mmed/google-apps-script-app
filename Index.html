@@ -144,6 +144,78 @@
             box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.09);
         }
 
+        .admin-multi-select {
+            position: relative;
+            min-height: 46px;
+            padding: 0;
+            overflow: visible;
+            cursor: pointer;
+        }
+
+        .admin-multi-select.active {
+            background: rgba(15, 118, 110, 0.08);
+            border-color: rgba(15, 118, 110, 0.45);
+            color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.07);
+        }
+
+        .admin-multi-trigger {
+            min-height: 44px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .admin-multi-label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .admin-multi-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            left: 0;
+            z-index: 70;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 8px;
+            background: white;
+            border: 1px solid var(--line-color);
+            border-radius: 14px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+        }
+
+        .admin-multi-option {
+            width: 100%;
+            padding: 10px 9px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #334155;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .admin-multi-option:hover,
+        .admin-multi-option.selected {
+            background: rgba(15, 118, 110, 0.08);
+            color: var(--primary-color);
+        }
+
+        .admin-multi-option input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
         label { color: #334155; font-size: 13px; font-weight: 700; }
 
         .btn-primary {
@@ -602,9 +674,9 @@
             </div>
             <div id="filters-visits" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-visits-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-visits-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-visits-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('visits', 'market')"><option value="">كل الماركتات</option></select>
+                    <div id="filter-visits-prov" class="input-field admin-multi-select transition-colors" data-placeholder="كل المحافظات" onclick="toggleAdminMultiFilter('visits', 'prov', event)"></div>
+                    <div id="filter-visits-emp" class="input-field admin-multi-select transition-colors" data-placeholder="كل المندوبين" onclick="toggleAdminMultiFilter('visits', 'emp', event)"></div>
+                    <div id="filter-visits-market" class="input-field admin-multi-select col-span-2 transition-colors" data-placeholder="كل الماركتات" onclick="toggleAdminMultiFilter('visits', 'market', event)"></div>
                     <select id="filter-visits-reason" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors" onchange="onFilterChange('visits', 'reason')"><option value="">كل الأسباب</option><option value="خط سير">خط سير</option><option value="طلبية">طلبية</option></select>
                     
                     <div class="relative col-span-1 mt-1">
@@ -628,9 +700,9 @@
             </div>
             <div id="filters-daily" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-daily-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-daily-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-daily-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('daily', 'market')"><option value="">كل الماركتات</option></select>
+                    <div id="filter-daily-prov" class="input-field admin-multi-select transition-colors" data-placeholder="كل المحافظات" onclick="toggleAdminMultiFilter('daily', 'prov', event)"></div>
+                    <div id="filter-daily-emp" class="input-field admin-multi-select transition-colors" data-placeholder="كل المندوبين" onclick="toggleAdminMultiFilter('daily', 'emp', event)"></div>
+                    <div id="filter-daily-market" class="input-field admin-multi-select col-span-2 transition-colors" data-placeholder="كل الماركتات" onclick="toggleAdminMultiFilter('daily', 'market', event)"></div>
                     
                     <div class="relative col-span-1 mt-1">
                         <label id="label-daily-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
@@ -653,9 +725,9 @@
             </div>
             <div id="filters-monthly" class="hidden bg-white border-b border-gray-100 p-4 space-y-3 mb-4 shadow-sm md:rounded-b-2xl relative z-40">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="filter-monthly-prov" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'prov')"><option value="">كل المحافظات</option></select>
-                    <select id="filter-monthly-emp" multiple size="4" class="input-field py-2.5 text-sm font-bold transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'emp')"><option value="">كل المندوبين</option></select>
-                    <select id="filter-monthly-market" multiple size="4" class="input-field py-2.5 text-sm font-bold col-span-2 transition-colors min-h-[116px]" onchange="onFilterChange('monthly', 'market')"><option value="">كل الماركتات</option></select>
+                    <div id="filter-monthly-prov" class="input-field admin-multi-select transition-colors" data-placeholder="كل المحافظات" onclick="toggleAdminMultiFilter('monthly', 'prov', event)"></div>
+                    <div id="filter-monthly-emp" class="input-field admin-multi-select transition-colors" data-placeholder="كل المندوبين" onclick="toggleAdminMultiFilter('monthly', 'emp', event)"></div>
+                    <div id="filter-monthly-market" class="input-field admin-multi-select col-span-2 transition-colors" data-placeholder="كل الماركتات" onclick="toggleAdminMultiFilter('monthly', 'market', event)"></div>
                     
                     <div class="relative col-span-1 mt-1">
                         <label id="label-monthly-date-from" class="absolute -top-2.5 right-3 bg-white px-2 text-xs font-bold text-gray-500 z-10 rounded-full border border-gray-100">من</label>
@@ -1107,7 +1179,10 @@
         document.addEventListener('click', function(e) { 
             if(!e.target.closest('.custom-select')) { 
                 document.querySelectorAll('[id$="-dropdown"]').forEach(el => el.classList.add('hidden')); 
-            } 
+            }
+            if(!e.target.closest('.admin-multi-select')) {
+                document.querySelectorAll('.admin-multi-dropdown').forEach(el => el.classList.add('hidden'));
+            }
         });
 
         function initPillPickers() {
@@ -1778,28 +1853,114 @@
 
         function getSelectedValues(selectEl) {
             if(!selectEl) return [];
-            return Array.from(selectEl.selectedOptions).map(opt => opt.value).filter(Boolean);
+            try {
+                return JSON.parse(selectEl.dataset.selected || "[]");
+            } catch(e) {
+                return [];
+            }
         }
 
         function hasAnySelectedValue(selectEl) {
             return getSelectedValues(selectEl).length > 0;
         }
 
-        function setMultiSelectOptions(selectEl, allLabel, values, selectedValues = []) {
+        function setMultiSelectOptions(selectEl, allLabel, values, selectedValues) {
+            selectedValues = selectedValues || getSelectedValues(selectEl);
+            selectEl.dataset.placeholder = selectEl.dataset.placeholder || allLabel;
+            selectEl.dataset.options = JSON.stringify(values);
+            selectEl.dataset.selected = JSON.stringify(selectedValues.filter(value => values.includes(value)));
+            renderAdminMultiSelect(selectEl);
+        }
+
+        function renderAdminMultiSelect(selectEl) {
+            const values = JSON.parse(selectEl.dataset.options || "[]");
+            const selectedValues = getSelectedValues(selectEl);
             const selectedSet = new Set(selectedValues);
-            selectEl.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>` + values.map(value => {
-                const selected = selectedSet.has(value) ? ' selected' : '';
-                const safeValue = escapeHtml(value);
-                return `<option value="${safeValue}"${selected}>${safeValue}</option>`;
-            }).join('');
+            const placeholder = selectEl.dataset.placeholder || "الكل";
+            const labelText = selectedValues.length === 0
+                ? placeholder
+                : (selectedValues.length === 1 ? selectedValues[0] : `${selectedValues.length} محدد`);
+
+            selectEl.classList.toggle('active', selectedValues.length > 0);
+            selectEl.innerHTML = `
+                <div class="admin-multi-trigger">
+                    <span class="admin-multi-label">${escapeHtml(labelText)}</span>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                </div>
+                <div class="admin-multi-dropdown hidden">
+                    <button type="button" class="admin-multi-option ${selectedValues.length === 0 ? 'selected' : ''}" onclick="clearAdminMultiFilter('${selectEl.id}', event)">
+                        <input type="checkbox" ${selectedValues.length === 0 ? 'checked' : ''} readonly>
+                        <span>${escapeHtml(placeholder)}</span>
+                    </button>
+                    ${values.map(value => {
+                        const checked = selectedSet.has(value);
+                        const safeValue = escapeHtml(value);
+                        const encodedValue = encodeURIComponent(value).replace(/'/g, "%27");
+                        return `
+                            <button type="button" class="admin-multi-option ${checked ? 'selected' : ''}" onclick="toggleAdminFilterValue('${selectEl.id}', '${encodedValue}', event)">
+                                <input type="checkbox" ${checked ? 'checked' : ''} readonly>
+                                <span>${safeValue}</span>
+                            </button>`;
+                    }).join('')}
+                </div>`;
+        }
+
+        function toggleAdminMultiFilter(type, key, event) {
+            event.stopPropagation();
+            const field = document.getElementById(`filter-${type}-${key}`);
+            const dropdown = field.querySelector('.admin-multi-dropdown');
+            const willOpen = dropdown.classList.contains('hidden');
+
+            document.querySelectorAll('.admin-multi-dropdown').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id$="-dropdown"]').forEach(el => el.classList.add('hidden'));
+
+            if(willOpen) dropdown.classList.remove('hidden');
+        }
+
+        function toggleAdminFilterValue(fieldId, encodedValue, event) {
+            event.stopPropagation();
+            const field = document.getElementById(fieldId);
+            const value = decodeURIComponent(encodedValue);
+            const selected = getSelectedValues(field);
+            const nextSelected = selected.includes(value)
+                ? selected.filter(item => item !== value)
+                : [...selected, value];
+
+            field.dataset.selected = JSON.stringify(nextSelected);
+            renderAdminMultiSelect(field);
+            onFilterChangeFromFieldId(fieldId);
+            const refreshedField = document.getElementById(fieldId);
+            if(refreshedField) refreshedField.querySelector('.admin-multi-dropdown').classList.remove('hidden');
+        }
+
+        function clearAdminMultiFilter(fieldId, event) {
+            event.stopPropagation();
+            const field = document.getElementById(fieldId);
+            field.dataset.selected = "[]";
+            renderAdminMultiSelect(field);
+            onFilterChangeFromFieldId(fieldId);
+            const refreshedField = document.getElementById(fieldId);
+            if(refreshedField) refreshedField.querySelector('.admin-multi-dropdown').classList.remove('hidden');
+        }
+
+        function onFilterChangeFromFieldId(fieldId) {
+            const parts = fieldId.replace('filter-', '').split('-');
+            const type = parts[0];
+            const source = parts[1];
+            onFilterChange(type, source);
         }
 
         function escapeHtml(value) {
             return String(value || "")
                 .replace(/&/g, "&amp;")
                 .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
+        }
+
+        function escapeAttr(value) {
+            return escapeHtml(value);
         }
 
         function syncDateTo(type) {
@@ -1864,7 +2025,11 @@
             const ids = ['prov', 'emp', 'market', 'reason', 'date-from', 'date-to'];
             ids.forEach(id => {
                 const el = document.getElementById(`filter-${type}-${id}`);
-                if(el && el.multiple) Array.from(el.options).forEach(opt => opt.selected = false);
+                if(el && el.classList.contains('admin-multi-select')) {
+                    el.dataset.selected = "[]";
+                    renderAdminMultiSelect(el);
+                }
+                else if(el && el.multiple) Array.from(el.options).forEach(opt => opt.selected = false);
                 else if(el) el.value = '';
             });
             onFilterChange(type, 'clear');
